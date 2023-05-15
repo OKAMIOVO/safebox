@@ -67,14 +67,16 @@ extern struct Device comMainBoard;
 extern struct Device voicePlayer;
 extern struct Device comFingerprint;
 extern struct Device led;
+extern struct Device touchBoard;
 int main()
 {
     RegisterToDeviceList(&sysTick);
     RegisterToDeviceList(&comMainBoard);
-    //RegisterToDeviceList(&comFingerprint);
+    RegisterToDeviceList(&comFingerprint);
     RegisterToDeviceList(&keyBoard);
     RegisterToDeviceList(&voicePlayer);
 	RegisterToDeviceList(&led);
+	RegisterToDeviceList(&touchBoard);
     deviceMgr.sleepAndAwake = SleepAndAwake;
 	deviceMgr.sleepTime = 10000;
 	//UART2_Init(SystemCoreClock, 115200);

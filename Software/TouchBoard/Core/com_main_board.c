@@ -360,7 +360,7 @@ void ReportKeyEvent(int keyValue, enum KeyEvent event)
         }
     }
 }
-void FpmUserReport(uint8_t cnt)
+/* void FpmUserReport(uint8_t cnt)
 {
     struct DataFrame temp;
     temp.cmd = FPM_CNT_REPORT;
@@ -419,7 +419,7 @@ void FpRegStroeResult(uint8_t result)
     {
         PRINT("TX QUEUE IS FULL\n");
     }
-}
+} */
 void ComSleep()
 {
     PRINT("com_main sleep\n");

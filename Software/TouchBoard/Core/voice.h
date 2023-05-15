@@ -59,8 +59,8 @@ VOICE_ALARM2,
 VOICE_FAIL_SOUND,
 };
 typedef unsigned          char uint8_t;
-void VoiceInit();
-void VoiceSleep();
+void VoiceInit(void);
+void VoiceSleep(void);
 void PlayWaterDrop(void);
 void PlayPleaseInputAain(void);
 void PlayPleaseRenewInput(void);
@@ -72,4 +72,5 @@ void PLAY_VOICE_SEGMENT(const uint8_t* segment,uint8_t len);
 void SET_VOLUME(uint8_t volume);
 void PLAY_BUTTON_VOICE(uint8_t segment);
 void STOP_PLAY_VOICE_MULTISEGMENTS(void);
+void PlayInputFpm(void);
 #endif

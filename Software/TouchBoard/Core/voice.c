@@ -69,7 +69,7 @@ uint8_t SystemLanguage = 0;
 void VoiceInit(void);
 void VoiceSleep(void);
 void VoiceTask(MultiTimer *timer, void *userData);
-void PlayPleaseInputFpm();
+void PlayPleaseInputFpm(void);
 
 struct Device voicePlayer = {NULL, VoiceInit, VoiceSleep};
 typedef struct
@@ -89,7 +89,7 @@ VoiceMgr_t VoiceMgr;
 
 MultiTimer voiceTimer;
 
-void VoiceInit()
+void VoiceInit(void)
 {
     PORT_Init(PORT1, PIN2, OUTPUT);       // VOICE DATA
     PORT_Init(PORT2, PIN3, PULLUP_INPUT); // VOICE BUSY
@@ -105,7 +105,7 @@ void VoiceInit()
 //     MultiTimerStart(&voiceTimer, 1, VoiceTask, NULL);
 // }
 
-void VoiceSleep()
+void VoiceSleep(void)
 {
     TM40_Channel_Stop(TM4_CHANNEL_3);
     PRINT("voice player sleep\n");
@@ -296,7 +296,7 @@ void PlayPleaseInputFpm()
     //    PlayVoice(temp, sizeof(temp));
 }
 
-void PlayInputFpm(){
+void PlayInputFpm(void){
     uint8_t temp[] = {VOICE_PLEASE, VOICE_INPUT, VOICE_FINGERPRINT};
     PLAY_VOICE_SEGMENT(temp, sizeof(temp));
 }
