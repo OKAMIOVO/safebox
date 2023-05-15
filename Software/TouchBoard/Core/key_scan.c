@@ -243,6 +243,7 @@ void KeyScan(MultiTimer* timer, void* userData)
             KeyFilter(IfPush(i), &keyStateList[i], i, KeyEventCallback);
         }
     }
+    // PRINT("Key Scan!\n");
     MultiTimerStart(&keyTimer, SCAN_PERIOD, KeyScan, NULL);
 }
 

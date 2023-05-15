@@ -83,14 +83,16 @@ void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
     InitQueue(com.fpmDataQueue, DATA_FRAME_CNT_MAX, txDataFrame);
-    MultiTimerStart(&comTimer, 10, dealWithFpmData, NULL);
+    // MultiTimerStart(&comTimer, 600, dealWithFpmData, NULL);
 }
 
-void dealWithFpmData(MultiTimer* timer, void* userData){
-    PRINT("Enter dealWithFpmData!\n");
+/* void dealWithFpmData(MultiTimer* timer, void* userData){
+    // PRINT("Enter dealWithFpmData!\n");
+    // PRINT("com.fpmDataQueueArray.cmd = %x",com.fpmDataQueueArray.cmd);
     while (fpmCnt < DATA_FRAME_CNT_MAX && !IsEmpty(com.fpmDataQueue)) {
         GetFrontAndDequque(com.fpmDataQueue, com.fpmDataQueueArray);
-        PRINT("com.fpmDataQueueArray.cmd = %x",com.fpmDataQueueArray.cmd);
+        PRINT("com.fpmDataQueueArray.cmd = %d\r\n",com.fpmDataQueueArray.cmd);
+        PRINT("com.fpmDataQueueArray.dataBuf[0] = %d\r\n",com.fpmDataQueueArray.dataBuf[0]);
         if(com.fpmDataQueueArray.cmd == FPM_CTRL){
             if(com.fpmDataQueueArray.dataBuf[0] == FPM_START_IDENTIFY){
                 fpmTask.startIdentifyFlag = 1;
@@ -139,31 +141,29 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
         }
 
         fpmCnt++;
-
-
+    }
     MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
-}
 
-}
+} */
 
 void SendFpmCmd(uint8_t state, uint8_t data)
 {
-    PRINT("ENTER SendFpmCmd!\n");
     struct DataFrame temp;
     temp.cmd = FPM_CTRL;
     temp.len = 2;
     temp.dataBuf[0] = state;
     temp.dataBuf[1] = data;
+    PRINT("ENTER SendFpmCmd!\n");
     EnqueueElem(com.fpmDataQueue,temp);
 }
 
 void FpmUserReport(uint8_t cnt)
 {
-    PRINT("ENTER FpmUserReport!\n");
     struct DataFrame temp;
     temp.cmd = FPM_CNT_REPORT;
     temp.len = 1;
     temp.dataBuf[0] = (uint8_t)cnt;
+    PRINT("ENTER FpmUserReport!\n");
     if (!IsFull(com.fpmDataQueue))
     {
         EnqueueElem(com.fpmDataQueue, temp);
@@ -175,11 +175,11 @@ void FpmUserReport(uint8_t cnt)
 }
 void FpIdentifyResult(uint8_t result)
 {
-    PRINT("ENTER FpIdentifyResult!\n");
     struct DataFrame temp;
     temp.cmd = FP_INDENTIFY_RESULT;
     temp.len = 1;
     temp.dataBuf[0] = result;
+    PRINT("ENTER FpIdentifyResult!\n");
     if (!IsFull(com.fpmDataQueue))
     {
         EnqueueElem(com.fpmDataQueue, temp);
@@ -191,11 +191,11 @@ void FpIdentifyResult(uint8_t result)
 }
 void FpRegGenCharResult(uint8_t result)
 {
-    PRINT("ENTER FpRegGenCharResult!\n");
     struct DataFrame temp;
     temp.cmd = FP_REG_GET_AND_GEN;
     temp.len = 1;
     temp.dataBuf[0] = result;
+    PRINT("ENTER FpRegGenCharResult!\n");
     if (!IsFull(com.fpmDataQueue))
     {
         EnqueueElem(com.fpmDataQueue, temp);
@@ -207,11 +207,11 @@ void FpRegGenCharResult(uint8_t result)
 }
 void FpRegStroeResult(uint8_t result)
 {
-    PRINT("ENTER FpRegStroeResult!\n");
     struct DataFrame temp;
     temp.cmd = FP_REG_REG_AND_STORE;
     temp.len = 1;
     temp.dataBuf[0] = result;
+    PRINT("ENTER FpRegStroeResult!\n");
     if (!IsFull(com.fpmDataQueue))
     {
         EnqueueElem(com.fpmDataQueue, temp);
