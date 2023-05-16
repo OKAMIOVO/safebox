@@ -13,7 +13,7 @@ void CloseTestSleep(void);
 struct Device closeTest = { NULL, CloseTestInit, CloseTestSleep };
 static MultiTimer closeTestTimer;
 void CloseTestCallback(MultiTimer* timer, void* userData);
-extern void UART2_SendData(uint8_t data[],uint8_t len);
+extern void UART2_SendData(uint8_t data[]);
 void CloseTestInit()
 {
     PORT_Init(PORT2, PIN3, PULLUP_INPUT);
@@ -29,11 +29,11 @@ void CloseTestCallback(MultiTimer* timer, void* userData)
         if (!state) {
             // SafeBoxFsm(DOOR_OPEN, NULL);
             //UART_SendData(open,1);
-            UART2_SendData(open,1);
+            UART2_SendData(open);
         } else {
             // SafeBoxFsm(DOOR_CLOSE, NULL);
             //UART_SendData(close,1);
-			UART2_SendData(close,1);
+			UART2_SendData(close);
         }
         lastaState = state;
     }

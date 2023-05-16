@@ -98,12 +98,12 @@ void ComInit()
     MultiTimerStart(&comTimer, 10, ComTask, NULL);
 }
 
-void UART2_SendData(uint8_t *sendData, uint8_t sendLen)
+void UART2_SendData(uint8_t *sendData)
 {
     struct DataFrame *dataFrame = NULL;
 
     // 检查输入参数是否有效
-    if (sendData == NULL || sendLen <= 0)
+    if (sendData == NULL)
     {
         return;
     }
@@ -116,7 +116,7 @@ void UART2_SendData(uint8_t *sendData, uint8_t sendLen)
         return;
     }
 
-    dataFrame->len = sendLen;
+    dataFrame->len = 0;
     dataFrame->cmd = sendData[0];
 
     // 发送数据帧
@@ -263,6 +263,7 @@ static void ComTask(MultiTimer *timer, void *userData)
     }
     if (!com.toReplyFlag)
     {
+        //com.rxCnt是全局变量，把他的地址作为参数，交给GeneralParse函数处理
         GeneralParse(RxHandler, com.rxBuf, &com.rxCnt);
         // UART2_ReceiveData();
     }

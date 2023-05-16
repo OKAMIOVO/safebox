@@ -10,7 +10,7 @@ void VibrationTestSleep(void);
 struct Device vibrationTest = { NULL, VibrationTestInit, VibrationTestSleep };
 static MultiTimer vibrationTestTimer;
 void VibrationTestCallback(MultiTimer* timer, void* userData);
-extern void UART2_SendData(uint8_t* sendData, uint8_t sendLen);
+extern void UART2_SendData(uint8_t* sendData);
 uint8_t vibrationTestEnable = 0;
 void VibrationTestInit()
 {
@@ -27,7 +27,7 @@ void VibrationTestCallback(MultiTimer* timer, void* userData)
             g_intp1Taken = 0;
 			// PRINT("enter vibrationTestCallBack!\n");
             uint8_t vibration[] = {VIBRATION_EVENT};
-            UART2_SendData(vibration, 1);
+            UART2_SendData(vibration);
             // SafeBoxFsm(VIBRATION_EVENT, NULL);
         }
     }else{

@@ -20,7 +20,7 @@
 void MotorInit(void);
 void MotorSleep(void);
 struct Device motor = { NULL, MotorInit, NULL };
-extern void UART2_SendData(uint8_t* sendData, uint8_t sendLen);
+extern void UART2_SendData(uint8_t* sendData);
 void SetPwm(int pwm)
 {
     if (pwm == 0) {
@@ -87,7 +87,9 @@ void MotorTimerHandler(MultiTimer* timer, void* userData)
             PRINT("stop\n");
             motorState = MOTOR_STOP;
             pwmMotor = 0;
-            UART2_SendData(MOTOR_TASK_FINISH,NULL);
+            PRINT("MOTOR_TASK_FINISH!\r\n");
+            uint8_t temp[] = {MOTOR_TASK_FINISH};
+            UART2_SendData(temp);
         }
     }
     // PRINT("pwmMotor = %d\n",pwmMotor);

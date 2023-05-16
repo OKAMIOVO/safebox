@@ -122,6 +122,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
         }else if(com.fpmDataQueueArray.cmd == FP_INDENTIFY_RESULT){
             uint8_t temp = FINGERPRINT_WAY;
             if(com.fpmDataQueueArray.dataBuf[0] == 0){
+                PRINT("fpm send IDENTIFY_SUCCESS\n");
                 SafeBoxFsm(IDENTIFY_SUCCESS, &temp);
             }else{
                 SafeBoxFsm(IDENTIFY_FAIL, &temp);

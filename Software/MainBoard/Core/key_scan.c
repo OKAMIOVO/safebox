@@ -59,7 +59,7 @@ void KeyEventCallback(int keyValue, enum KeyEvent event);
 void (*keyEventHandler)(int value, uint8_t eventType) = NULL;
 void LongPushDetect(MultiTimer* timer, void* userData);
 void TestOpenDoorHandler(int keyValue, uint8_t event);
-extern void UART2_SendData(uint8_t* sendData, uint8_t sendLen);
+extern void UART2_SendData(uint8_t* sendData);
 #define KEY_CNT 2
 struct Gpio {
     PORT_TypeDef port;
@@ -120,7 +120,7 @@ void TestOpenDoorHandler(int keyValue, uint8_t event){
         // 短按触发以后，callback不为NULL，长按触发以后callback=NULL，所以这里时短按释放
         if (keyValue == KEY_SET && setKeyLongPushTimer.callback) {
             MultiTimerStop(&setKeyLongPushTimer);
-            UART2_SendData(temp,1);
+            UART2_SendData(temp);
         } else if (keyValue == KEY_MODE && modeKeyLongPushTimer.callback) {
             MultiTimerStop(&modeKeyLongPushTimer);
         }
@@ -133,9 +133,9 @@ void TestOpenDoorHandler(int keyValue, uint8_t event){
     } else if (event == LONG_TRIGGER) {
         if (keyValue == KEY_SET) {
             setKeyLongPushTimer.callback = NULL;
-            UART2_SendData(&temp[1],1);
+            UART2_SendData(&temp[1]);
         } else if (keyValue == KEY_MODE) {
-            UART2_SendData(&temp[2],1);
+            UART2_SendData(&temp[2]);
             modeKeyLongPushTimer.callback = NULL;
         }
     }

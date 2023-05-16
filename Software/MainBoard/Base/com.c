@@ -38,6 +38,8 @@ void GeneralParse(int (*rxHandler)(const uint8_t*, int), uint8_t* buf, int* pLen
             headAddr += ret;
         }
     }
+    /* 将缓冲区中剩余的字节移动到缓冲区的开头。如果headAddr大于0，则说明已经找到了消息头。在这种情况下，将*pLen减去headAddr，以便更新缓冲区中剩余的字节数。
+    然后，使用一个循环将缓冲区中剩余的字节移动到缓冲区的开头。这样做是为了确保下一次调用GeneralParse函数时，缓冲区中的数据从消息头开始。 */
     if (headAddr > 0) {
         *pLen -= headAddr;
         for (i = 0; i < *pLen; ++i) {

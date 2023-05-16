@@ -10,7 +10,7 @@
 void BatteryInit(void);
 void BatterySleep(void);
 struct Device battery = { NULL, BatteryInit, BatterySleep };
-extern void UART2_SendData(uint8_t* sendData, uint8_t sendLen);
+extern void UART2_SendData(uint8_t* sendData);
 
 MultiTimer batteryTimer;
 void BatteryTask(MultiTimer* timer, void* userData);
@@ -102,7 +102,7 @@ void BatteryInit()
 if(BatteryLevel==LEVEL_0||BatteryLevel==LEVEL_1){
 	// SafeBoxFsm(LOW_BATTERY_ALARM, NULL);
     uint8_t battery[] = {LOW_BATTERY_ALARM};
-    UART2_SendData(battery,1);
+    UART2_SendData(battery);
 }	
 }
 void BatterySleep()
