@@ -68,6 +68,7 @@ extern void SafeBoxFsm(uint8_t event, uint8_t *userData);
 void SendDataFrame(struct DataFrame *dataFrame);
 uint8_t uart2RxFlag = 0;
 const uint8_t* uart2RxBuff;
+void UART2_ReceiveData();
 
 void Uart2SendEndCallback()
 {
@@ -201,7 +202,8 @@ static int RxHandler(const uint8_t *buf, int n)
             return 1;
         }
         uart2RxFlag = 1;
-        PRINT("RxHandler run!\n");
+        UART2_ReceiveData();
+        // PRINT("Touch Uart2RxHandler run!\r\n");
         if (uart2RxBuff[2] < 0x80)
         {   // need reply to main board
             //     if (buf[2] == LED_CTRL) {
@@ -239,7 +241,7 @@ static int RxHandler(const uint8_t *buf, int n)
             //     com.replyDataFrame.cmd = buf[2];
             //     com.replyDataFrame.len = 0;
         }
-        else
+        /* else
         { // get reply from main board
             if (com.waitReplyFlag)
             {
@@ -254,7 +256,7 @@ static int RxHandler(const uint8_t *buf, int n)
                     }
                 }
             }
-        }
+        } */
         
     }
 
@@ -299,7 +301,7 @@ void ComTask(MultiTimer *timer, void *userData)
     if (!com.toReplyFlag)
     {
         GeneralParse(RxHandler, com.rxBuf, &com.rxCnt);
-        UART2_ReceiveData();
+        // UART2_ReceiveData();
     }
     if (!com.sendBusyFlag)
     {

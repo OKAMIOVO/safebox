@@ -64,6 +64,7 @@ void ComTask(MultiTimer *timer, void *userData);
 
 static void SendDataFrame(struct DataFrame *dataFrame);
 static int RxHandler(const uint8_t *buf, int n);
+void UART2_ReceiveData();
 extern uint8_t vibrationTestEnable;
 uint8_t uart2RxFlag = 0;
 const uint8_t *uart2RxBuff;
@@ -80,7 +81,6 @@ void Uart2RxByteCallback()
     }
     // com.rxBuf[com.rxCnt++]=rxByte;
     UART2_Receive(&rxByte, 1);
-    UART2_Send(&rxByte, 1);
 }
 
 void ComInit()
@@ -126,7 +126,7 @@ void UART2_SendData(uint8_t *sendData, uint8_t sendLen)
 
 static void SendDataFrame(struct DataFrame *dataFrame)
 {
-    PRINT("MAIN send cmd:%02x,len:%d,buf:\n", dataFrame->cmd, dataFrame->len);
+    PRINT("MAIN send cmd:%02x,len:%d,buf:\r\n", dataFrame->cmd, dataFrame->len);
     PrintfBuf(dataFrame->dataBuf, dataFrame->len);
     com.sendBuf[0] = 0xaa;
     com.sendBuf[1] = dataFrame->len;
@@ -169,57 +169,58 @@ static int RxHandler(const uint8_t *buf, int n)
             return 1;
         }
         uart2RxFlag = 1;
-        PRINT("RxHandler run!\n");
+        UART2_ReceiveData();
+        // PRINT("MAIN RxHandler run!\r\n");
         
-        /* #ifdef PRJ_KEY_BOARD
-            if (buf[2] < 0x80)
-        #else
-            if (buf[2] & 0x80)
-        #endif
+        /*#ifdef PRJ_KEY_BOARD*/
+        //    if (buf[2] < 0x80)
+        //#else
+        //    if (buf[2] & 0x80)
+        //#endif
             {
-                // need reply to
-                if (buf[2] == KEY_VALUE_REPORT) {
-                    if (keyEventHandler != NULL) {
-                        keyEventHandler(buf[3], buf[4]);
-                    }
-                } else if (buf[2] == FPM_CNT_REPORT) {
-                    uint8_t userData = buf[3];
-                    // SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
-                } else if (buf[2] == FP_INDENTIFY_RESULT) {
-                    uint8_t temp = FINGERPRINT_WAY;
-                    if (buf[3] == 0) {
-                        // SafeBoxFsm(IDENTIFY_SUCCESS, &temp);
-                    } else {
-                        // SafeBoxFsm(IDENTIFY_FAIL, &temp);
-                    }
-                } else if (buf[2] == FP_REG_GET_AND_GEN) {
-                    if (buf[3] == 0) {
-                        // SafeBoxFsm(REG_ONCE_SUCCESS, NULL);
-                    } else {
-                        // SafeBoxFsm(REG_ONCE_FAIL, NULL);
-                    }
-                } else if (buf[2] == FP_REG_REG_AND_STORE) {
-                    if (buf[3] == 0) {
-                        // SafeBoxFsm(REG_ONE_FINGER_SUCCESS, NULL);
-                    } else {
-                        // SafeBoxFsm(REG_ONE_FINGER_FAIL, NULL);
-                    }
-                }
-                com.toReplyFlag = 1;
-                com.replyDataFrame.cmd = buf[2];
-                com.replyDataFrame.len = 0;
-            } else { // get reply from
+                // // need reply to
+                // if (buf[2] == KEY_VALUE_REPORT) {
+                //     if (keyEventHandler != NULL) {
+                //         keyEventHandler(buf[3], buf[4]);
+                //     }
+                // } else if (buf[2] == FPM_CNT_REPORT) {
+                //     uint8_t userData = buf[3];
+                //     // SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
+                // } else if (buf[2] == FP_INDENTIFY_RESULT) {
+                //     uint8_t temp = FINGERPRINT_WAY;
+                //     if (buf[3] == 0) {
+                //         // SafeBoxFsm(IDENTIFY_SUCCESS, &temp);
+                //     } else {
+                //         // SafeBoxFsm(IDENTIFY_FAIL, &temp);
+                //     }
+                // } else if (buf[2] == FP_REG_GET_AND_GEN) {
+                //     if (buf[3] == 0) {
+                //         // SafeBoxFsm(REG_ONCE_SUCCESS, NULL);
+                //     } else {
+                //         // SafeBoxFsm(REG_ONCE_FAIL, NULL);
+                //     }
+                // } else if (buf[2] == FP_REG_REG_AND_STORE) {
+                //     if (buf[3] == 0) {
+                //         // SafeBoxFsm(REG_ONE_FINGER_SUCCESS, NULL);
+                //     } else {
+                //         // SafeBoxFsm(REG_ONE_FINGER_FAIL, NULL);
+                //     }
+                // }
+                //com.toReplyFlag = 1;
+                // com.replyDataFrame.cmd = buf[2];
+                //com.replyDataFrame.len = 0;
+            } /*else { // get reply from
                 if (com.waitReplyFlag) {
                     if (buf[2] == GetFront(com.txQueue).cmd) {
                         com.waitReplyFlag = 0;
                         com.timeoutCnt = 0;
                         Dequeue(com.txQueue);
                         if (buf[2] == SLEEP_CMD) {
-                            MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
+                            // MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
                         }
                     }
                 }
-            } */
+            }*/
     }
     return len + 5;
 }
@@ -228,7 +229,7 @@ void UART2_ReceiveData()
 {
     if (uart2RxFlag == 1)
     {
-        PRINT("MAIN recv cmd:%02x,len:%d,buf:\n", uart2RxBuff[2], uart2RxBuff[1]);
+        PRINT("MAIN recv cmd:%02x,len:%d,buf:\r\n", uart2RxBuff[2], uart2RxBuff[1]);
         PrintfBuf(uart2RxBuff + 3, uart2RxBuff[1]);
         if (uart2RxBuff[2] == START_UNLOCK)
         {
@@ -263,7 +264,7 @@ static void ComTask(MultiTimer *timer, void *userData)
     if (!com.toReplyFlag)
     {
         GeneralParse(RxHandler, com.rxBuf, &com.rxCnt);
-        UART2_ReceiveData();
+        // UART2_ReceiveData();
     }
     if (!com.sendBusyFlag)
     {

@@ -118,7 +118,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
                 fpmTask.sleepFpmFlag = 1;
         }else if(com.fpmDataQueueArray.cmd == FPM_CNT_REPORT){
             uint8_t userData = com.fpmDataQueueArray.dataBuf[0];
-            SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
+            // SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
         }else if(com.fpmDataQueueArray.cmd == FP_INDENTIFY_RESULT){
             uint8_t temp = FINGERPRINT_WAY;
             if(com.fpmDataQueueArray.dataBuf[0] == 0){
