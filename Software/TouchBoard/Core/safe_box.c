@@ -103,7 +103,7 @@ uint8_t delayEvent, delayData[10];
 extern void SetLedState(uint8_t Num, uint8_t state);
 extern void UART2_SendData(uint8_t* sendData, uint8_t sendLen);
 // extern void CtrlTouchBoardLed(uint8_t* ledBuf);
-// extern void SendFpmCmd(uint8_t state, uint8_t data);
+extern void SendFpmCmd(uint8_t state, uint8_t data);
 
 void DelayExcuteCb(MultiTimer* timer, void* userData)
 {
@@ -125,8 +125,8 @@ void StartIdentify()
     // OpenLed(LED_TOUCH_BOARD_NUM);
     SetLedState(LED_TOUCH_BOARD_NUM, OPEN);
     // CtrlTouchBoardLed(ledState);
-    // SendFpmCmd(FPM_STOP_IDENTIFY,0);
-    // SendFpmCmd(FPM_SET_COLOR, BLUE);
+    SendFpmCmd(FPM_STOP_IDENTIFY,0);
+    SendFpmCmd(FPM_SET_COLOR, BLUE);
     sysState = IDENTIFY_STATE;
     keyEventHandler = IdentifyKeyHandler;
     ReadPassword();
@@ -134,7 +134,7 @@ void StartIdentify()
     PRINT("keyEventHandler = IdentifyKeyHandler;\n");
     PRINT("password len=%d\n", passwordLen);
     restoreFactoryTimer.callback = NULL;
-    // SendFpmCmd(FPM_START_IDENTIFY, 0);
+    SendFpmCmd(FPM_START_IDENTIFY, 0);
     MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
 }
 void GotoAlarmState(uint8_t type)
@@ -206,7 +206,7 @@ void StartRegister(uint8_t entry)
         registerState = FINGERPRINT_REGISTER;
         MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
         enrollTimes = 1;
-    //    SendFpmCmd(FPM_START_REGISTER, 0);
+       SendFpmCmd(FPM_START_REGISTER, 0);
         keyEventHandler = RegFpmKeyHandler;
         PRINT("keyEventHandler = RegFpmKeyHandler;\n");
         temp[voiceLen++] = VOICE_PASSWORD;
@@ -234,7 +234,7 @@ void StartRegister(uint8_t entry)
         sysState = REGISTER_STATE;
         registerState = WAIT_REGISTER;
         keyEventHandler = WaitRegKeyHandler;
-    //    SendFpmCmd(FPM_START_REGISTER, 0);
+       SendFpmCmd(FPM_START_REGISTER, 0);
         PRINT("keyEventHandler = WaitRegKeyHandler;\n");
     }
    PLAY_VOICE_SEGMENT(temp, voiceLen);
@@ -309,8 +309,8 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
             if (passwordLen == 0 && fpmUserCnt == 0) {
                 IdentifyPass();
             } else {
-            //    SendFpmCmd(FPM_STOP_IDENTIFY,0);
-            //    SendFpmCmd(FPM_SET_COLOR,RED);
+               SendFpmCmd(FPM_STOP_IDENTIFY,0);
+               SendFpmCmd(FPM_SET_COLOR,RED);
                 uint8_t temp[] = { VOICE_IDENTIFY, VOICE_FAIL };
                PLAY_VOICE_SEGMENT(temp, sizeof(temp));
                 if (userData[0] == FINGERPRINT_WAY) {
@@ -367,7 +367,7 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
 //            SendPasswordToOtherSys(NULL, 0);
         } else if (/* event == PASSWORD_BACKUP_SUCCESS && */ restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback) {
             fpmUserCnt = 0;
-        //    SendFpmCmd(FPM_CLR_CMD, 0);
+           SendFpmCmd(FPM_CLR_CMD, 0);
             ClrPassword();
             GotoDoorOpenedState();
             restoreFactoryTimer.callback = NULL;
@@ -401,7 +401,7 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
             SetLedState(LED_TOUCH_BOARD_NUM, OFF);
             PRINT("REGISTER_STATE EXIT_REGISTER LED_SET_NUM Close!\n");
             // CtrlTouchBoardLed(ledState);
-        //    SendFpmCmd(FPM_EXIT_REGISTER, 0);
+           SendFpmCmd(FPM_EXIT_REGISTER, 0);
             GotoDoorOpenedState();
             uint8_t temp[] = { VOICE_EXIT_MENU };
             PLAY_VOICE_SEGMENT(temp, sizeof(temp));
@@ -415,7 +415,7 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
             SetLedState(LED_TOUCH_BOARD_NUM, OFF);
             PRINT("REGISTER_STATE DOOR_CLOSE LED_UNLOCK_NUM Close!\n");
             // CtrlTouchBoardLed(ledState);
-        //    SendFpmCmd(FPM_EXIT_REGISTER, 0);
+           SendFpmCmd(FPM_EXIT_REGISTER, 0);
             uint8_t temp[] = { VOICE_EXIT_MENU };
             PLAY_VOICE_SEGMENT(temp, sizeof(temp));
             deviceMgr.sleepTime = 10000;
@@ -423,8 +423,8 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
             PRINT("DOOR CLOSE\n");
             doorNotCloseTimer.callback = NULL;
             MultiTimerStop(&doorNotCloseTimer);
-        //    SendFpmCmd(FPM_STOP_IDENTIFY,0);
-        //    SendFpmCmd(FPM_SET_COLOR, OFF);
+           SendFpmCmd(FPM_STOP_IDENTIFY,0);
+           SendFpmCmd(FPM_SET_COLOR, OFF);
             // 通知触摸板休眠
         } else {
             if (registerState == WAIT_REGISTER && event == REG_ONCE_SUCCESS) {
@@ -432,11 +432,11 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
                 registerState = FINGERPRINT_REGISTER;
                 enrollTimes = 1;
                 keyEventHandler = RegFpmKeyHandler;
-            //    SendFpmCmd(FPM_START_REGISTER, 0);
+               SendFpmCmd(FPM_START_REGISTER, 0);
                 PRINT("keyEventHandler = RegFpmKeyHandler;\n");
             } else if (registerState == WAIT_REGISTER && event == REG_ONCE_FAIL) {
                 MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
-            //    SendFpmCmd(FPM_START_REGISTER, 0);
+               SendFpmCmd(FPM_START_REGISTER, 0);
                 uint8_t temp[] = { VOICE_REGISTER, VOICE_FAIL };
                 PLAY_VOICE_SEGMENT(temp, sizeof(temp));
             } else if (registerState == FINGERPRINT_REGISTER) {
@@ -446,16 +446,16 @@ void SafeBoxFsm(uint8_t event, uint8_t* userData)
                     if (enrollTimes <= 5) {
                         uint8_t temp[] = { VOICE_PLEASE, VOICE_AGAIN, VOICE_INPUT };
                         PLAY_VOICE_SEGMENT(temp, sizeof(temp));
-                    //    SendFpmCmd(FPM_CONTINUE_REGISTER, enrollTimes);
+                       SendFpmCmd(FPM_CONTINUE_REGISTER, enrollTimes);
                     } else {
-                    //    SendFpmCmd(FPM_STORE, fpmUserCnt);
+                       SendFpmCmd(FPM_STORE, fpmUserCnt);
                     }
                 } else if (event == REG_ONCE_FAIL || event == REG_ONCE_FAIL) {
                     MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
                     enrollTimes = 1;
                     uint8_t temp[] = { VOICE_REGISTER, VOICE_FAIL, VOICE_PLEASE, VOICE_RENEW, VOICE_INPUT };
                     PLAY_VOICE_SEGMENT(temp, sizeof(temp));
-                //    SendFpmCmd(FPM_START_REGISTER, enrollTimes);
+                   SendFpmCmd(FPM_START_REGISTER, enrollTimes);
                 } else if (event == REG_ONE_FINGER_SUCCESS) {
                     fpmUserCnt++;
                     StartRegister(RESTART);
@@ -540,8 +540,8 @@ void IdentifyPass()
     fingerprintIdentifyFailTimes = 0;
     passwordIdentifyFailTimes = 0;
     identifyState = WAIT_BOTH_INDETIFY;
-//    SendFpmCmd(FPM_STOP_IDENTIFY,0);
-//    SendFpmCmd(FPM_SET_COLOR, GREEN);
+   SendFpmCmd(FPM_STOP_IDENTIFY,0);
+   SendFpmCmd(FPM_SET_COLOR, GREEN);
 }
 
 void AlarmCallback(MultiTimer* timer, void* userData)
@@ -659,7 +659,7 @@ void WaitRegKeyHandler(int keyValue, uint8_t event)
             registerState = PASSWORD_REGISTER;
             keyEventHandler = RegPasswordKeyHandler;
             PRINT("keyEventHandler = RegPasswordKeyHandler;\n");
-        //    SendFpmCmd(FPM_EXIT_REGISTER, 0);
+           SendFpmCmd(FPM_EXIT_REGISTER, 0);
             registerPasswordInputTimes = 0;
             PRINT("registerState = PASSWORD_REGISTER;\n");
             memset(passwordInputBuf[0], 0xff, 16);
@@ -710,7 +710,7 @@ void RegPasswordKeyHandler(int keyValue, uint8_t event)
                         MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
                         enrollTimes = 1;
                         keyEventHandler = RegFpmKeyHandler;
-                    //    SendFpmCmd(FPM_START_REGISTER, 0);
+                       SendFpmCmd(FPM_START_REGISTER, 0);
                         PRINT("keyEventHandler = RegFpmKeyHandler;\n");
                     } else {
                         PlayRegisterFail();

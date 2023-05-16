@@ -83,13 +83,13 @@ void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
     InitQueue(com.fpmDataQueue, DATA_FRAME_CNT_MAX, txDataFrame);
-    // MultiTimerStart(&comTimer, 600, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 600, dealWithFpmData, NULL);
 }
 
-/* void dealWithFpmData(MultiTimer* timer, void* userData){
+void dealWithFpmData(MultiTimer* timer, void* userData){
     // PRINT("Enter dealWithFpmData!\n");
     // PRINT("com.fpmDataQueueArray.cmd = %x",com.fpmDataQueueArray.cmd);
-    while (fpmCnt < DATA_FRAME_CNT_MAX && !IsEmpty(com.fpmDataQueue)) {
+    while (/* fpmCnt < DATA_FRAME_CNT_MAX &&  */!IsEmpty(com.fpmDataQueue)) {
         GetFrontAndDequque(com.fpmDataQueue, com.fpmDataQueueArray);
         PRINT("com.fpmDataQueueArray.cmd = %d\r\n",com.fpmDataQueueArray.cmd);
         PRINT("com.fpmDataQueueArray.dataBuf[0] = %d\r\n",com.fpmDataQueueArray.dataBuf[0]);
@@ -140,11 +140,11 @@ void FPMDealInit(void)
             }
         }
 
-        fpmCnt++;
+        // fpmCnt++;
     }
     MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
 
-} */
+}
 
 void SendFpmCmd(uint8_t state, uint8_t data)
 {
@@ -154,7 +154,12 @@ void SendFpmCmd(uint8_t state, uint8_t data)
     temp.dataBuf[0] = state;
     temp.dataBuf[1] = data;
     PRINT("ENTER SendFpmCmd!\n");
-    EnqueueElem(com.fpmDataQueue,temp);
+    if (!IsFull(com.fpmDataQueue)){
+        EnqueueElem(com.fpmDataQueue,temp);
+    }else{
+        PRINT("QUEUE IS FULL\n");
+    }
+    
 }
 
 void FpmUserReport(uint8_t cnt)
@@ -170,7 +175,7 @@ void FpmUserReport(uint8_t cnt)
     }
     else
     {
-        PRINT("TX QUEUE IS FULL\n");
+        PRINT("QUEUE IS FULL\n");
     }
 }
 void FpIdentifyResult(uint8_t result)
@@ -186,7 +191,7 @@ void FpIdentifyResult(uint8_t result)
     }
     else
     {
-        PRINT("TX QUEUE IS FULL\n");
+        PRINT("QUEUE IS FULL\n");
     }
 }
 void FpRegGenCharResult(uint8_t result)
@@ -202,7 +207,7 @@ void FpRegGenCharResult(uint8_t result)
     }
     else
     {
-        PRINT("TX QUEUE IS FULL\n");
+        PRINT("QUEUE IS FULL\n");
     }
 }
 void FpRegStroeResult(uint8_t result)
@@ -218,7 +223,7 @@ void FpRegStroeResult(uint8_t result)
     }
     else
     {
-        PRINT("TX QUEUE IS FULL\n");
+        PRINT("QUEUE IS FULL\n");
     }
 }
 

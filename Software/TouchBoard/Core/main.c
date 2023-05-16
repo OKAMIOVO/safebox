@@ -82,7 +82,7 @@ int main()
 	//UART2_Init(SystemCoreClock, 115200);
 	
     DeviceInit();
-	// PORT_SetBit(PORT12, PIN4);
+	PORT_SetBit(PORT12, PIN4);
 	
 	PRINT("while 1\n");
     // ReportKeyEvent(0, 0);
