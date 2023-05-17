@@ -112,7 +112,7 @@ extern void UART2_SendData(uint8_t *sendData);
 // extern void CtrlTouchBoardLed(uint8_t* ledBuf);
 extern void SendFpmCmd(uint8_t state, uint8_t data);
 extern void SleepFpmBoard(void);
-
+extern void SleepTouchBoard(void);
 void DelayExcuteCb(MultiTimer *timer, void *userData)
 {
     SafeBoxFsm(delayEvent, delayData);

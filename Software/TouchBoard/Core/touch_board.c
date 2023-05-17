@@ -58,7 +58,6 @@ static uint8_t rxFifiData[BUF_LEN_MAX];
 struct Com com;
 
 static MultiTimer comTimer;
-struct Device touchBoard = {NULL, FPMDealInit, NULL};
 
 struct FpmComTask
 {
@@ -83,7 +82,7 @@ void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
     InitQueue(com.fpmDataQueue, DATA_FRAME_CNT_MAX, txDataFrame);
-    MultiTimerStart(&comTimer, 600, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 1000, dealWithFpmData, NULL);
 }
 
 void dealWithFpmData(MultiTimer* timer, void* userData){
@@ -143,7 +142,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
 
         // fpmCnt++;
     }
-    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 10, dealWithFpmData, NULL);
 
 }
 
@@ -241,10 +240,4 @@ void SleepFpmBoard(void)
     {
         PRINT("QUEUE IS FULL\n");
     }
-}
-
-void SleepTouchBoard(void){
-    PRINT("Enter SleepTouchBoard\r\n");
-    SleepFpmBoard();
-    MultiTimerStart(&deviceMgr.timer, 10, SleepTimerCallBack, NULL);
 }
