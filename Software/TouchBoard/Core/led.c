@@ -96,7 +96,6 @@ void SetLedState(uint8_t Num, uint8_t state)
 }
 void LedSleep()
 {
-    PRINT("ENTER LedSleep!\r\n");
     CLOSE_ALL_LED();
     PORT_ClrBit(PORT12, PIN4);
     PRINT("led sleep\n");

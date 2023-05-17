@@ -42,7 +42,6 @@ void SleepAndAwake()
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
     DeviceInit();
 	PRINT("awake!!\n");
-    PORT_SetBit(PORT12, PIN4);
 }
 static uint64_t sysMsCnt = 0;
 volatile uint32_t g_ticks;

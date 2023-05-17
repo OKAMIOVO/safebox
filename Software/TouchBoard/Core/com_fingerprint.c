@@ -579,7 +579,7 @@ void FPM_Mgr_Task(void)
 
 static void ComInit(void);
 static void ComSleep(void);
-struct Device comFingerprint = { NULL, ComInit, ComSleep };
+struct Device comFingerprint = { NULL, ComInit, NULL };
 
 void ComTask(MultiTimer* timer, void* userData);
 static uint8_t rxByte;

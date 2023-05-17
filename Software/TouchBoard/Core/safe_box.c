@@ -111,6 +111,7 @@ extern void SetLedState(uint8_t Num, uint8_t state);
 extern void UART2_SendData(uint8_t *sendData);
 // extern void CtrlTouchBoardLed(uint8_t* ledBuf);
 extern void SendFpmCmd(uint8_t state, uint8_t data);
+extern void SleepFpmBoard(void);
 
 void DelayExcuteCb(MultiTimer *timer, void *userData)
 {
@@ -121,7 +122,7 @@ static void SafeSleep(MultiTimer *timer, void *userData)
     PRINT("Enter safesleep!\r\n");
     // SetLedState(LED_TOUCH_BOARD_NUM,OFF);
     // sysState = SLEEP_STATE;
-    // SleepTouchBoard();
+    SleepTouchBoard();
 }
 MultiTimer sleepTimer;
 void StartIdentify()
@@ -142,7 +143,7 @@ void StartIdentify()
     PRINT("password len=%d\n", passwordLen);
     restoreFactoryTimer.callback = NULL;
     SendFpmCmd(FPM_START_IDENTIFY, 0);
-    // MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
+    MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
 }
 void GotoAlarmState(uint8_t type)
 {
@@ -749,7 +750,7 @@ void IdentifyKeyHandler(int keyValue, uint8_t event) // after register password 
     }
     if (sysState == IDENTIFY_STATE)
     {
-        // MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
+        MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
     }
 }
 void DoorOpenKeyHandler(int keyValue, uint8_t event)

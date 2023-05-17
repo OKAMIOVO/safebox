@@ -12,6 +12,7 @@ void RegisterToDeviceList(struct Device* device)
         temp = &((*temp)->next);
     }
     *temp = device;
+    (*temp)->next = NULL;
 }
 void DeviceInit()
 {
@@ -25,12 +26,24 @@ void DeviceInit()
 void SleepTimerCallBack(MultiTimer* timer, void* userData)
 {
     PRINT("SLEEP\n");
-    struct Device* temp = deviceList;
-    for (; temp; temp = temp->next) {
+    struct Device** temp = &deviceList;
+    /* while(((*temp)->next) != NULL){
+        if (((*temp)->sleep) != NULL) {
+            PRINT("device sleep\r\n");
+            (*temp)->sleep();
+        }
+        temp = &((*temp)->next);
+    } */
+    for (; temp; temp = &((*temp)->next)) {
+        if ((*temp)->sleep) {
+            (*temp)->sleep();
+        }
+    }
+    /* for (; temp; temp = temp->next) {
         if (temp->sleep) {
             temp->sleep();
         }
-    }
+    } */
     if (deviceMgr.sleepAndAwake != NULL) {
         deviceMgr.sleepAndAwake();
     }

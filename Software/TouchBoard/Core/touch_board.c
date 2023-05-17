@@ -228,7 +228,23 @@ void FpRegStroeResult(uint8_t result)
     }
 }
 
-void SleepTouchBoard(){
+void SleepFpmBoard(void)
+{
+    struct DataFrame temp;
+    temp.cmd = SLEEP_CMD;
+    temp.len = 0;
+    if (!IsFull(com.fpmDataQueue))
+    {
+        EnqueueElem(com.fpmDataQueue, temp);
+    }
+    else
+    {
+        PRINT("QUEUE IS FULL\n");
+    }
+}
+
+void SleepTouchBoard(void){
     PRINT("Enter SleepTouchBoard\r\n");
-    MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
+    SleepFpmBoard();
+    MultiTimerStart(&deviceMgr.timer, 10, SleepTimerCallBack, NULL);
 }

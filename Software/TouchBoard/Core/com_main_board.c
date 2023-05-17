@@ -59,7 +59,7 @@ static uint8_t rxByte;
 
 static void ComInit(void);
 static void ComSleep(void);
-struct Device comMainBoard = {NULL, ComInit, ComSleep};
+struct Device comMainBoard = {NULL, ComInit, NULL};
 
 static MultiTimer comTimer;
 void ComTask(MultiTimer *timer, void *userData);
@@ -204,8 +204,8 @@ static int RxHandler(const uint8_t *buf, int n)
         uart2RxFlag = 1;
         UART2_ReceiveData();
         // PRINT("Touch Uart2RxHandler run!\r\n");
-        if (uart2RxBuff[2] < 0x80)
-        {   // need reply to main board
+        // if (uart2RxBuff[2] < 0x80)
+        // {   // need reply to main board
             //     if (buf[2] == LED_CTRL) {
             //         int i = 0;
             //         for (i = 0; i < 5; ++i) {
@@ -240,7 +240,7 @@ static int RxHandler(const uint8_t *buf, int n)
             //     com.toReplyFlag = 1;
             //     com.replyDataFrame.cmd = buf[2];
             //     com.replyDataFrame.len = 0;
-        }
+        // }
         /* else
         { // get reply from main board
             if (com.waitReplyFlag)
@@ -422,10 +422,10 @@ void FpRegStroeResult(uint8_t result)
         PRINT("TX QUEUE IS FULL\n");
     }
 } */
-void ComSleep()
+/* void ComSleep()
 {
     PRINT("com_main sleep\n");
-    // UART2_Stop();
-    // INTP_Init(1<<2,INTP_RISING);
-    // INTP_Start(1<<2);
-}
+    UART2_Stop();
+    INTP_Init(1<<2,INTP_RISING);
+    INTP_Start(1<<2);
+} */
