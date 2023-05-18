@@ -578,7 +578,7 @@ void FPM_Mgr_Task(void)
 }
 
 void ComInit(void);
-static void ComSleep(void);
+void FPM_ComSleep(void);
 struct Device comFingerprint = { NULL, ComInit, NULL };
 
 void ComTask(MultiTimer* timer, void* userData);
@@ -612,6 +612,7 @@ struct FpmComTask fpmTask;
 #define GREEN 4
 uint8_t colorSet;
 void SetColor(uint8_t color);
+void FPMDealInit(void);
 void SetColorCallback(MultiTimer* timer, void* userData)
 {
     if (FpmAckMgr.Status == GotACK) {
@@ -866,26 +867,27 @@ static void ComTask(MultiTimer* timer, void* userData)
             PRINT("store\n");
         } else if (fpmTask.sleepFpmFlag) {
             fpmTask.sleepFpmFlag = 0;
+            StopIdentify();
             //    StopRegisterFp();
             PRINT("stop reg\n");
         }
     }
-    MultiTimerStart(&taskTimer, 16, ComTask, NULL);
+    MultiTimerStart(&taskTimer, 12, ComTask, NULL);
 }
 
-void ComSleep()
+void FPM_ComSleep()
 {
-    // FpmAckMgr.Status = WaitACK;
-    // FPM_SendSleepCmd();
-    // while (UART1_Mgr.Status != GotNewCmd)
-    //     ;
-    // FPMcmd_Excute();
-    // if (FpmAckMgr.Status == GotACK && FpmAckMgr.ErrorCode == Error_NONE && PINMACRO_FPM_TOUCH_STATUS == 0x00) {
-    //     PORT_ClrBit(PORT12, PIN3);
-    //     UART1_Stop();
-    //     INTP_Init(1 << 1, INTP_RISING);
-    //     INTP_Start(1 << 1);
-    // }
+    /* FpmAckMgr.Status = WaitACK; */
+    /* FPM_SendSleepCmd();
+    while (UART1_Mgr.Status != GotNewCmd)
+        ;
+    FPMcmd_Excute();
+    if (FpmAckMgr.Status == GotACK && FpmAckMgr.ErrorCode == Error_NONE && PINMACRO_FPM_TOUCH_STATUS == 0x00) {
+        PORT_ClrBit(PORT12, PIN3);
+        UART1_Stop();
+        INTP_Init(1 << 1, INTP_RISING);
+        INTP_Start(1 << 1);
+    } */
 }
 uint8_t txBuf[50];
 static uint8_t uart1SendBusyFlag = 0;

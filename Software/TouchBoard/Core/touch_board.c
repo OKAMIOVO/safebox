@@ -3,13 +3,9 @@
 // CHIP LIB
 #include "CMS32L051.h"
 #include "userdefine.h"
-#include "sci.h"
 // SELF DEF LIB
 #include "queue.h"
 #include "MultiTimer.h"
-#include "cal.h"
-#include "com.h"
-#include "intp.h"
 #include "device.h"
 #include "log.h"
 // PRJ HEADERS
@@ -26,6 +22,9 @@
 void SendFpmCmd(uint8_t state, uint8_t data);
 void FPMDealInit(void);
 void dealWithFpmData(MultiTimer* timer, void* userData);
+void awakeFpm(void);
+extern void StartIdentify();
+extern void LockInit();
 
 struct DataFrame {
     uint8_t cmd;
@@ -71,7 +70,7 @@ void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
     InitQueue(com.fpmDataQueue, DATA_BUF_LEN_MAX, txDataFrame);
-    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 20, dealWithFpmData, NULL);
 }
 
 void dealWithFpmData(MultiTimer* timer, void* userData){
@@ -102,9 +101,9 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
                 fpmTask.setColorFlag = 1;
                 fpmTask.setColor = com.fpmDataQueueArray.dataBuf[1];
             }
-        }else if(com.fpmDataQueueArray.cmd == SLEEP_CMD){
+        }/* else if(com.fpmDataQueueArray.cmd == SLEEP_CMD){
                 fpmTask.sleepFpmFlag = 1;
-        }else if(com.fpmDataQueueArray.cmd == FPM_CNT_REPORT){
+        } */else if(com.fpmDataQueueArray.cmd == FPM_CNT_REPORT){
             uint8_t userData = com.fpmDataQueueArray.dataBuf[0];
             // SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
         }else if(com.fpmDataQueueArray.cmd == FP_INDENTIFY_RESULT){
@@ -216,21 +215,15 @@ void FpRegStroeResult(uint8_t result)
     }
 }
 
-void SleepFpmBoard(void)
-{
-    struct DataFrame temp;
-    temp.cmd = SLEEP_CMD;
-    temp.len = 0;
-    if (!IsFull(com.fpmDataQueue))
-    {
-        EnqueueElem(com.fpmDataQueue, temp);
-    }
-    else
-    {
-        PRINT("QUEUE IS FULL\n");
-    }
+void SleepTouchBoard(void){
+    fpmTask.sleepFpmFlag = 1;
+    sleepFlag = 1;
 }
 
-void SleepTouchBoard(void){
-    sleepFlag = 1;
+void awakeFpm(void){
+    // StartIdentify();
+    SendFpmCmd(FPM_STOP_IDENTIFY, 0);
+    SendFpmCmd(FPM_SET_COLOR, BLUE);
+    StartIdentify();
+    // LockInit();
 }

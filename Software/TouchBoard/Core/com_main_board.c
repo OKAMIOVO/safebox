@@ -57,9 +57,9 @@ static uint8_t rxFifiData[BUF_LEN_MAX];
 
 static uint8_t rxByte;
 
-void MAINComInit(void);
-static void ComSleep(void);
-struct Device comMainBoard = {NULL, MAINComInit, NULL};
+void mainComInit(void);
+void mainComSleep(void);
+struct Device comMainBoard = {NULL, mainComInit, NULL};
 
 static MultiTimer comTimer;
 void ComTask(MultiTimer *timer, void *userData);
@@ -84,7 +84,7 @@ void Uart2RxByteCallback()
     UART2_Receive(&rxByte, 1);
 }
 
-void MAINComInit()
+void mainComInit()
 {
     SystemCoreClockUpdate();
     UART2_Init(SystemCoreClock, 115200);
@@ -405,10 +405,10 @@ void FpRegStroeResult(uint8_t result)
         PRINT("TX QUEUE IS FULL\n");
     }
 } */
-/* void ComSleep()
+void mainComSleep()
 {
     PRINT("com_main sleep\n");
     UART2_Stop();
     INTP_Init(1<<2,INTP_RISING);
     INTP_Start(1<<2);
-} */
+}

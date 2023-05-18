@@ -21,12 +21,19 @@ extern void KeyBoardSleep();
 extern void VoiceSleep(void);
 extern void LedSleep();
 extern void SleepFpmBoard(void);
+extern void clearQueue(void);
+extern void FPM_ComSleep(void);
+extern void SleepFpmBoard(void);
+extern void mainComSleep(void);
+
+extern void awakeFpm(void);
 
 extern void CSK14_Init();
-extern void MAINComInit();
+extern void mainComInit();
 extern void VoiceInit(void);
 extern void LedInit();
 extern void ComInit(void);
+extern void FPMDealInit(void);
 
 void SysTickInit()
 {
@@ -54,11 +61,12 @@ void SleepAndAwake()
     CGC->PMUCTL = 0;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
     SysTickInit();
-    MAINComInit();
+    mainComInit();
     CSK14_Init();
     VoiceInit();
     LedInit();
     ComInit();
+    awakeFpm();
 
     PRINT("awake!!\n");
     PORT_SetBit(PORT12, PIN4);
@@ -116,20 +124,25 @@ int main()
     while (1)
     {
         MultiTimerYield();
-        if(sleepFlag == 1)
+        if (sleepFlag == 1)
         {
+//            SleepFpmBoard();
+//            FPM_ComSleep();
             SysTickSleep();
             KeyBoardSleep();
             VoiceSleep();
             LedSleep();
-            SleepFpmBoard();
+            mainComSleep();
+            
+            
             sleepFlag = 0;
             awakeFlag = 1;
         }
-       if(awakeFlag == 1){
+        if (awakeFlag == 1)
+        {
             deviceMgr.sleepAndAwake();
             awakeFlag = 0;
-       }
+        }
     }
 }
 void SendBuf(uint8_t *buf, int len)
