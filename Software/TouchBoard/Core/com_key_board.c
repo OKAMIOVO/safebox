@@ -73,7 +73,7 @@ void Uart2RxByteCallback()
     UART2_Receive(&rxByte, 1);
 }
 
-void ComInit()
+static void ComInit()
 {
     SystemCoreClockUpdate();
     UART2_Init(SystemCoreClock, 115200);
@@ -161,7 +161,7 @@ static int RxHandler(const uint8_t* buf, int n)
                 com.timeoutCnt = 0;
                 Dequeue(com.txQueue);
                 if (buf[2] == SLEEP_CMD) {
-                    MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
+                    // MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
                 }
             }
         }

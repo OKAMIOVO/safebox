@@ -10,10 +10,23 @@
 #include "key_filter.h"
 #include "iica.h"
 
+uint8_t sleepFlag = 0;
+uint8_t awakeFlag = 0;
 void SysTickInit(void);
 void SysTickSleep(void);
 uint64_t GetSysMsCnt(void);
-struct Device sysTick = { NULL, SysTickInit, SysTickSleep };
+struct Device sysTick = {NULL, SysTickInit, SysTickSleep};
+
+extern void KeyBoardSleep();
+extern void VoiceSleep(void);
+extern void LedSleep();
+extern void SleepFpmBoard(void);
+
+extern void CSK14_Init();
+extern void MAINComInit();
+extern void VoiceInit(void);
+extern void LedInit();
+extern void ComInit(void);
 
 void SysTickInit()
 {
@@ -25,8 +38,8 @@ void SysTickInit()
 }
 void SysTickSleep()
 {
-//    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk; // disable systick
-	PRINT("systick sleep\n");
+    //    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk; // disable systick
+    PRINT("systick sleep\n");
 }
 void SleepAndAwake()
 {
@@ -40,8 +53,14 @@ void SleepAndAwake()
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 0;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-    DeviceInit();
-	PRINT("awake!!\n");
+    SysTickInit();
+    MAINComInit();
+    CSK14_Init();
+    VoiceInit();
+    LedInit();
+    ComInit();
+
+    PRINT("awake!!\n");
     PORT_SetBit(PORT12, PIN4);
 }
 static uint64_t sysMsCnt = 0;
@@ -68,6 +87,7 @@ extern struct Device voicePlayer;
 extern struct Device comFingerprint;
 extern struct Device led;
 extern struct Device touchboard;
+
 int main()
 {
     RegisterToDeviceList(&sysTick);
@@ -78,26 +98,41 @@ int main()
     RegisterToDeviceList(&led);
     RegisterToDeviceList(&touchboard);
     deviceMgr.sleepAndAwake = SleepAndAwake;
-	deviceMgr.sleepTime = 10000;
-	//UART2_Init(SystemCoreClock, 115200);
-	
+    deviceMgr.sleepTime = 10000;
+    // UART2_Init(SystemCoreClock, 115200);
+
     DeviceInit();
-	PORT_SetBit(PORT12, PIN4);
-	
-	PRINT("while 1\n");
+    PORT_SetBit(PORT12, PIN4);
+
+    PRINT("while 1\n");
     // ReportKeyEvent(0, 0);
     PRINT("while 1\n");
-//PORT_Init(PORT13,PIN7,INPUT);
-//	PORT_Init(PORT2,PIN0,OUTPUT);
-//			PORT_SetBit(PORT2,PIN0);
-//								PORT_Init(PORT4,PIN0,OUTPUT);
-//			PORT_ClrBit(PORT4,PIN0);
+    // PORT_Init(PORT13,PIN7,INPUT);
+    //	PORT_Init(PORT2,PIN0,OUTPUT);
+    //			PORT_SetBit(PORT2,PIN0);
+    //								PORT_Init(PORT4,PIN0,OUTPUT);
+    //			PORT_ClrBit(PORT4,PIN0);
     PRINT("device init finish\n");
-    while (1) {
-		MultiTimerYield();
+    while (1)
+    {
+        MultiTimerYield();
+        if(sleepFlag == 1)
+        {
+            SysTickSleep();
+            KeyBoardSleep();
+            VoiceSleep();
+            LedSleep();
+            SleepFpmBoard();
+            sleepFlag = 0;
+            awakeFlag = 1;
+        }
+       if(awakeFlag == 1){
+            deviceMgr.sleepAndAwake();
+            awakeFlag = 0;
+       }
     }
 }
-void SendBuf(uint8_t* buf, int len)
+void SendBuf(uint8_t *buf, int len)
 {
     while (g_uart2_tx_count)
         ;

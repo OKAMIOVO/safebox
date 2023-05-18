@@ -57,9 +57,9 @@ static uint8_t rxFifiData[BUF_LEN_MAX];
 
 static uint8_t rxByte;
 
-static void ComInit(void);
+void MAINComInit(void);
 static void ComSleep(void);
-struct Device comMainBoard = {NULL, ComInit, NULL};
+struct Device comMainBoard = {NULL, MAINComInit, NULL};
 
 static MultiTimer comTimer;
 void ComTask(MultiTimer *timer, void *userData);
@@ -84,7 +84,7 @@ void Uart2RxByteCallback()
     UART2_Receive(&rxByte, 1);
 }
 
-void ComInit()
+void MAINComInit()
 {
     SystemCoreClockUpdate();
     UART2_Init(SystemCoreClock, 115200);

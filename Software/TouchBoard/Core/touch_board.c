@@ -47,6 +47,7 @@ struct Com com;
 
 static MultiTimer comTimer;
 struct Device touchboard = {NULL,FPMDealInit,NULL};
+extern uint8_t sleepFlag;
 struct FpmComTask
 {
     uint8_t startIdentifyFlag : 1;
@@ -231,7 +232,5 @@ void SleepFpmBoard(void)
 }
 
 void SleepTouchBoard(void){
-    PRINT("Enter SleepTouchBoard\r\n");
-    //SleepFpmBoard();
-    MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
+    sleepFlag = 1;
 }

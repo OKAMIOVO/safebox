@@ -577,7 +577,7 @@ void FPM_Mgr_Task(void)
     FPMcmd_Excute();
 }
 
-static void ComInit(void);
+void ComInit(void);
 static void ComSleep(void);
 struct Device comFingerprint = { NULL, ComInit, NULL };
 
@@ -661,7 +661,7 @@ void ReadUserListCallback(MultiTimer* timer, void* userData)
     }
 }
 void delayMS(uint32_t n);
-static void ComInit()
+void ComInit()
 {
     SystemCoreClockUpdate();
     UART1_Init(SystemCoreClock, 57600);
@@ -764,6 +764,7 @@ struct
 } FpIdentifyMgr;
 #define Def_FPMcmdTimeOutDelay 128 // 2s
 #define Def_IdendtifyFailScreenTimeDelay 192 // 3s
+extern uint8_t sleepFlag;
 typedef enum { bFALSE = 0,
     bTRUE = ~bFALSE } bool_t;
 struct
@@ -829,7 +830,7 @@ static void ComTask(MultiTimer* timer, void* userData)
                 break;
             }
         }
-        MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
+        // MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
         return;
     }
     if (fpmTask.stopIdentifyFlag) {
