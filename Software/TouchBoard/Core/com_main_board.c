@@ -102,28 +102,11 @@ void ComInit()
 
 void UART2_SendData(uint8_t *sendData)
 {
-    struct DataFrame *dataFrame = NULL;
+    struct DataFrame dataFrame;
 
-    // 检查输入参数是否有效
-    if (sendData == NULL)
-    {
-        return;
-    }
-
-    // 动态分配内存
-    dataFrame = (struct DataFrame *)malloc(sizeof(struct DataFrame));
-    if (dataFrame == NULL)
-    {
-        // 处理内存分配失败
-        return;
-    }
-
-    dataFrame->len = 0;
-    dataFrame->cmd = sendData[0];
-
-    // 发送数据帧
-    SendDataFrame(dataFrame);
-    free(dataFrame);
+    dataFrame.len = 0;
+    dataFrame.cmd = sendData[0];
+    SendDataFrame(&dataFrame);
 }
 
 void SendDataFrame(struct DataFrame *dataFrame)

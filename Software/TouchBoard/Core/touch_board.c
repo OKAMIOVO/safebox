@@ -10,13 +10,11 @@
 #include "cal.h"
 #include "com.h"
 #include "intp.h"
-#include "key_filter.h"
 #include "device.h"
 #include "log.h"
 // PRJ HEADERS
 // extern func and vaviable
 #include "safe_box.h"
-#include "password_manage.h"
 #include "queue.h"
 
 #define LED_CTRL 0x20
@@ -24,8 +22,6 @@
 #define VOICE_CMD 0x40
 #define SLEEP_CMD 0x50
 #define DATA_BUF_LEN_MAX 10
-#define DATA_FRAME_CNT_MAX 20
-#define BUF_LEN_MAX 32
 
 void SendFpmCmd(uint8_t state, uint8_t data);
 void FPMDealInit(void);
@@ -45,20 +41,12 @@ struct Com
         int16_t front, size, rear;
     } fpmDataQueue;
     struct DataFrame fpmDataQueueArray;
-    uint8_t sendBuf[BUF_LEN_MAX];
-    struct Queue fpmDataDealQueue;
-    uint8_t fpmRXBuf[BUF_LEN_MAX];
-    int fpmRXCnt;
-    int fpmDataCnt;
-    struct DataFrame replyDataFrame;
-    int8_t timeoutCnt;
 };
-static struct DataFrame txDataFrame[DATA_FRAME_CNT_MAX];
-static uint8_t rxFifiData[BUF_LEN_MAX];
+static struct DataFrame txDataFrame[DATA_BUF_LEN_MAX];
 struct Com com;
 
 static MultiTimer comTimer;
-
+struct Device touchboard = {NULL,FPMDealInit,NULL};
 struct FpmComTask
 {
     uint8_t startIdentifyFlag : 1;
@@ -81,8 +69,8 @@ uint8_t fpmCnt = 0;
 void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
-    InitQueue(com.fpmDataQueue, DATA_FRAME_CNT_MAX, txDataFrame);
-    MultiTimerStart(&comTimer, 1000, dealWithFpmData, NULL);
+    InitQueue(com.fpmDataQueue, DATA_BUF_LEN_MAX, txDataFrame);
+    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
 }
 
 void dealWithFpmData(MultiTimer* timer, void* userData){
@@ -142,7 +130,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
 
         // fpmCnt++;
     }
-    MultiTimerStart(&comTimer, 10, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
 
 }
 
@@ -240,4 +228,10 @@ void SleepFpmBoard(void)
     {
         PRINT("QUEUE IS FULL\n");
     }
+}
+
+void SleepTouchBoard(void){
+    PRINT("Enter SleepTouchBoard\r\n");
+    //SleepFpmBoard();
+    MultiTimerStart(&deviceMgr.timer, 0, SleepTimerCallBack, NULL);
 }

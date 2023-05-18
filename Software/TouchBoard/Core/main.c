@@ -42,6 +42,7 @@ void SleepAndAwake()
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
     DeviceInit();
 	PRINT("awake!!\n");
+    PORT_SetBit(PORT12, PIN4);
 }
 static uint64_t sysMsCnt = 0;
 volatile uint32_t g_ticks;
@@ -66,6 +67,7 @@ extern struct Device comMainBoard;
 extern struct Device voicePlayer;
 extern struct Device comFingerprint;
 extern struct Device led;
+extern struct Device touchboard;
 int main()
 {
     RegisterToDeviceList(&sysTick);
@@ -74,6 +76,7 @@ int main()
     RegisterToDeviceList(&keyBoard);
     RegisterToDeviceList(&voicePlayer);
     RegisterToDeviceList(&led);
+    RegisterToDeviceList(&touchboard);
     deviceMgr.sleepAndAwake = SleepAndAwake;
 	deviceMgr.sleepTime = 10000;
 	//UART2_Init(SystemCoreClock, 115200);
