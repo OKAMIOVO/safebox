@@ -128,7 +128,7 @@ int main()
             VibrationTestSleep();
             CloseTestSleep();
             KeyBoardSleep();
-            BatterySleep();
+            // BatterySleep();
             Key_ComSleep();
             SysTickSleep();
             

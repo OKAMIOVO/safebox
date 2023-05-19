@@ -48,7 +48,7 @@ struct Com
 static struct DataFrame txDataFrame[DATA_BUF_LEN_MAX];
 struct Com com;
 
-static MultiTimer comTimer,taskTimer;
+static MultiTimer comTimer;
 struct Device touchboard = {NULL,FPMDealInit,NULL};
 extern uint8_t sleepFlag;
 struct FpmComTask
@@ -236,7 +236,6 @@ void FpRegStroeResult(uint8_t result)
 
 void SleepTouchBoard(void){
     uint8_t temp[] = {SLEEP};
-    
     sleepFlag = 1;
     fpmTask.sleepFpmFlag = 1;
     UART2_SendData(temp);

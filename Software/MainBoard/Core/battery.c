@@ -11,6 +11,7 @@ void BatteryInit(void);
 void BatterySleep(void);
 struct Device battery = { NULL, BatteryInit, BatterySleep };
 extern void UART2_SendData(uint8_t* sendData);
+extern void delayMS(uint32_t n);
 
 MultiTimer batteryTimer;
 void BatteryTask(MultiTimer* timer, void* userData);
@@ -49,7 +50,7 @@ void HardwareBatVoltageA2dFilter(uint16_t NewA2d)
         }
     }
 
-    // a2d_data[a2d_databuffer_vbat] = NewA2d;
+    a2d_data[a2d_databuffer_vbat] = NewA2d;
 }
 void HardwareBatteryMgr_Task(void)
 {
@@ -102,6 +103,7 @@ void BatteryInit()
 if(BatteryLevel==LEVEL_0||BatteryLevel==LEVEL_1){
 	// SafeBoxFsm(LOW_BATTERY_ALARM, NULL);
     uint8_t battery[] = {LOW_BATTERY_ALARM};
+    delayMS(500);
     UART2_SendData(battery);
 }	
 }
