@@ -41,7 +41,7 @@ void CloseLed(uint8_t ledNum)
     }
 }
 
-enum
+/* enum
 {
     INIT_STATE,
     IDENTIFY_STATE,
@@ -49,7 +49,7 @@ enum
     REGISTER_STATE,
     ALARM_STATE,
     SLEEP_STATE
-};
+}; */
 enum
 {
     WAIT_REGISTER,
@@ -272,19 +272,17 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
     {
     case INIT_STATE:
     {
-        StartIdentify();
-        //        if (event == READ_USER_LIST_FINISH) {
-        //            // 是否需要保存用户列表
-        //            fpmUserCnt = *userData;
-        //
-        //
-        //            StartIdentify();
-        //            PRINT("INTI FINISH\n");
-        //        } else if (event == READ_USER_LIST_TIMEOUT) {
-        //            // 播报故障语音
-        //            uint8_t temp = VOICE_FAIL_SOUND;
-        //           PLAY_VOICE_SEGMENT(&temp, 1);
-        //        }
+        // StartIdentify();
+        if (event == READ_USER_LIST_FINISH) {
+            // 是否需要保存用户列表
+            fpmUserCnt = *userData;
+            StartIdentify();
+            PRINT("INTI FINISH\n");
+        } else if (event == READ_USER_LIST_TIMEOUT) {
+            // 播报故障语音
+            uint8_t temp = VOICE_FAIL_SOUND;
+            PLAY_VOICE_SEGMENT(&temp, 1);
+        }
     }
     break;
     case IDENTIFY_STATE:
@@ -569,10 +567,6 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
             StartIdentify();
             PRINT("time enough\n");
         }
-    }
-    break;
-    case SLEEP_STATE:
-    {
     }
     break;
     default:

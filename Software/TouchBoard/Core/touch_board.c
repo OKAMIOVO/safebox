@@ -25,7 +25,11 @@ void dealWithFpmData(MultiTimer* timer, void* userData);
 void awakeFpm(void);
 extern void StartIdentify();
 extern void LockInit();
-
+extern void SafeBoxFsm(uint8_t event, uint8_t *userData);
+extern void delayMS(uint32_t n);
+extern void FPM_ComTask(MultiTimer* timer, void* userData);
+extern void UART2_SendData(uint8_t *sendData);
+extern uint8_t sysState;
 struct DataFrame {
     uint8_t cmd;
     uint8_t len;
@@ -44,7 +48,7 @@ struct Com
 static struct DataFrame txDataFrame[DATA_BUF_LEN_MAX];
 struct Com com;
 
-static MultiTimer comTimer;
+static MultiTimer comTimer,taskTimer;
 struct Device touchboard = {NULL,FPMDealInit,NULL};
 extern uint8_t sleepFlag;
 struct FpmComTask
@@ -64,13 +68,11 @@ struct FpmComTask
 
 extern struct FpmComTask fpmTask;
 
-uint8_t fpmCnt = 0;
-
 void FPMDealInit(void)
 {
     PRINT("FPMDealInit!\n");
     InitQueue(com.fpmDataQueue, DATA_BUF_LEN_MAX, txDataFrame);
-    MultiTimerStart(&comTimer, 20, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 10, dealWithFpmData, NULL);
 }
 
 void dealWithFpmData(MultiTimer* timer, void* userData){
@@ -105,13 +107,14 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
                 fpmTask.sleepFpmFlag = 1;
         } */else if(com.fpmDataQueueArray.cmd == FPM_CNT_REPORT){
             uint8_t userData = com.fpmDataQueueArray.dataBuf[0];
-            // SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
+            SafeBoxFsm(READ_USER_LIST_FINISH, &userData);
         }else if(com.fpmDataQueueArray.cmd == FP_INDENTIFY_RESULT){
             uint8_t temp = FINGERPRINT_WAY;
             if(com.fpmDataQueueArray.dataBuf[0] == 0){
                 PRINT("fpm send IDENTIFY_SUCCESS\n");
                 SafeBoxFsm(IDENTIFY_SUCCESS, &temp);
             }else{
+                PRINT("fpm send IDENTIFY_FAIL\n");
                 SafeBoxFsm(IDENTIFY_FAIL, &temp);
             }
         }else if(com.fpmDataQueueArray.cmd == FP_REG_GET_AND_GEN){
@@ -130,7 +133,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
 
         // fpmCnt++;
     }
-    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 5, dealWithFpmData, NULL);
 
 }
 
@@ -160,6 +163,7 @@ void FpmUserReport(uint8_t cnt)
     if (!IsFull(com.fpmDataQueue))
     {
         EnqueueElem(com.fpmDataQueue, temp);
+
     }
     else
     {
@@ -215,15 +219,26 @@ void FpRegStroeResult(uint8_t result)
     }
 }
 
-void SleepTouchBoard(void){
-    fpmTask.sleepFpmFlag = 1;
-    sleepFlag = 1;
-}
+/* void SleepFPM()
+{
+    struct DataFrame temp;
+    temp.cmd = SLEEP_CMD;
+    temp.len = 0;
+    if (!IsFull(com.fpmDataQueue))
+    {
+        EnqueueElem(com.fpmDataQueue, temp);
+    }
+    else
+    {
+        PRINT("QUEUE IS FULL\n");
+    }
+} */
 
-void awakeFpm(void){
-    // StartIdentify();
-    SendFpmCmd(FPM_STOP_IDENTIFY, 0);
-    SendFpmCmd(FPM_SET_COLOR, BLUE);
-    StartIdentify();
-    // LockInit();
+void SleepTouchBoard(void){
+    uint8_t temp[] = {SLEEP};
+    
+    sleepFlag = 1;
+    fpmTask.sleepFpmFlag = 1;
+    UART2_SendData(temp);
+    FPM_ComTask(NULL,NULL);
 }

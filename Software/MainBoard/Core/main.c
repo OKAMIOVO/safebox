@@ -7,8 +7,30 @@
 #include "log.h"
 #include "device.h"
 #include "safe_box.h"
-void SysTickInit(void);
+
+uint8_t mainSleepFlag = 0;
+uint8_t awakeFlag = 0;
+
+extern void Key_ComSleep(void);
+extern void ComSleep(void);
+extern void VibrationTestSleep(void);
+extern void LedSleep();
+extern void CloseTestSleep(void);
+extern void KeyBoardSleep(void);
+extern void BatterySleep(void);
 void SysTickSleep(void);
+
+extern void SysTickInit(void);
+extern void MotorInit(void);
+extern void KeyComInit(void);
+extern void ComInit(void);
+extern void VibrationTestInit(void);
+extern void LedInit();
+extern void CloseTestInit(void);
+extern void KeyIoInit(void);
+extern void BuzzerInit(void);
+extern void BatteryInit(void);
+
 uint64_t GetSysMsCnt(void);
 struct Device sysTick = { NULL, SysTickInit, SysTickSleep };
 
@@ -31,11 +53,23 @@ void SleepAndAwake()
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 1;
     __STOP();
+    // NVIC_SystemReset();
+    
     CGC->PMUKEY = 0x192A;
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 0;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-    DeviceInit();
+    SysTickInit();
+    MotorInit();
+    KeyComInit();
+    ComInit();
+    VibrationTestInit();
+    LedInit();
+    CloseTestInit();
+    KeyIoInit();
+    BuzzerInit();
+    //BatteryInit();
+    // DeviceInit();
     // LockInit();
     deviceMgr.sleepTime = 10000;
 }
@@ -87,6 +121,26 @@ int main()
     PRINT("device init finish\n");
     while (1) {
         MultiTimerYield();
+        if (mainSleepFlag == 1)
+        {
+            
+            LedSleep();
+            VibrationTestSleep();
+            CloseTestSleep();
+            KeyBoardSleep();
+            BatterySleep();
+            Key_ComSleep();
+            SysTickSleep();
+            
+            
+            mainSleepFlag = 0;
+            awakeFlag = 1;
+        }
+        if (awakeFlag == 1)
+        {
+            deviceMgr.sleepAndAwake();
+            awakeFlag = 0;
+        }
     }
 }
 

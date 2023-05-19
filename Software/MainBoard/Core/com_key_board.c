@@ -24,6 +24,9 @@
 #define DATA_BUF_LEN_MAX 10
 #define DATA_FRAME_CNT_MAX 20
 #define BUF_LEN_MAX 32
+
+extern uint8_t mainSleepFlag;
+
 struct DataFrame
 {
     uint8_t cmd;
@@ -55,9 +58,9 @@ static uint8_t rxFifiData[BUF_LEN_MAX];
 
 static uint8_t rxByte;
 
-void ComInit(void);
-void ComSleep(void);
-struct Device comKeyBoard = {NULL, ComInit, ComSleep};
+void KeyComInit(void);
+void Key_ComSleep(void);
+struct Device comKeyBoard = {NULL, KeyComInit, Key_ComSleep};
 
 static MultiTimer comTimer;
 void ComTask(MultiTimer *timer, void *userData);
@@ -83,7 +86,7 @@ void Uart2RxByteCallback()
     UART2_Receive(&rxByte, 1);
 }
 
-void ComInit()
+void KeyComInit()
 {
     SystemCoreClockUpdate();
     UART2_Init(SystemCoreClock, 115200);
@@ -231,6 +234,10 @@ void UART2_ReceiveData()
         {
             vibrationTestEnable = 1;
         }
+        else if(uart2RxBuff[2] == SLEEP)
+        {
+            mainSleepFlag = 1;
+        }
 
         uart2RxFlag = 0;
     }
@@ -284,7 +291,7 @@ static void ComTask(MultiTimer *timer, void *userData)
     MultiTimerStart(&comTimer, 1, ComTask, NULL);
 }
 
-void ComSleep()
+void Key_ComSleep()
 {
     UART2_Stop();
     INTP_Init(1 << 0, INTP_RISING);

@@ -56,17 +56,18 @@ void SleepAndAwake()
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 1;
     __STOP();
+	NVIC_SystemReset();
     CGC->PMUKEY = 0x192A;
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 0;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-    SysTickInit();
+    /* SysTickInit();
     mainComInit();
     CSK14_Init();
     VoiceInit();
     LedInit();
-    ComInit();
-    awakeFpm();
+    ComInit(); */
+    // awakeFpm();
 
     PRINT("awake!!\n");
     PORT_SetBit(PORT12, PIN4);
@@ -100,11 +101,11 @@ int main()
 {
     RegisterToDeviceList(&sysTick);
     RegisterToDeviceList(&comMainBoard);
-    RegisterToDeviceList(&comFingerprint);
     RegisterToDeviceList(&keyBoard);
     RegisterToDeviceList(&voicePlayer);
     RegisterToDeviceList(&led);
     RegisterToDeviceList(&touchboard);
+    RegisterToDeviceList(&comFingerprint);
     deviceMgr.sleepAndAwake = SleepAndAwake;
     deviceMgr.sleepTime = 10000;
     // UART2_Init(SystemCoreClock, 115200);

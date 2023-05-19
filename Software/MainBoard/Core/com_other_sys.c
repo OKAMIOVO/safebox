@@ -44,8 +44,8 @@ static uint8_t rxFifiData[BUF_LEN_MAX];
 
 static uint8_t rxByte;
 
-static void ComInit(void);
-static void ComSleep(void);
+void ComInit(void);
+void ComSleep(void);
 struct Device comOtherSys = { NULL, ComInit, ComSleep };
 
 static MultiTimer comTimer;

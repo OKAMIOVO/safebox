@@ -581,7 +581,7 @@ void ComInit(void);
 void FPM_ComSleep(void);
 struct Device comFingerprint = { NULL, ComInit, NULL };
 
-void ComTask(MultiTimer* timer, void* userData);
+void FPM_ComTask(MultiTimer* timer, void* userData);
 static uint8_t rxByte;
 uint8_t fpUserCnt = 0;
 void FpmUserReport(uint8_t cnt);
@@ -693,10 +693,11 @@ void ComInit()
                 }
             }
             FpmUserReport(fpUserCnt);
+            PRINT("FpmUserReport excute!\n");
             //  PLAY_VOICE_MULTISEGMENTS_FIXED(&temp,1);
         }
     }
-    MultiTimerStart(&taskTimer, 16, ComTask, NULL);
+    MultiTimerStart(&taskTimer, 10, FPM_ComTask, NULL);
     fpmTask.startIdentifyFlag = 0;
     fpmTask.stopIdentifyFlag = 0;
     fpmTask.startRegisterFlag = 0;
@@ -782,10 +783,12 @@ void delayMS(uint32_t n);
 #define FPMpowerDown 0
 uint8_t FPMpowerMgrStatus;
 #define PINMACRO_FPM_TOUCH_STATUS (PORT_GetBit(PORT13, PIN6))
-static void ComTask(MultiTimer* timer, void* userData)
+void FPM_ComTask(MultiTimer* timer, void* userData)
 {
+    // PRINT("FPM_ComTask\n");
     FPM_Mgr_Task();
     if (fpmTask.sleepFpmFlag) {
+        // PRINT("fpmTask.sleepFpmFlag=1\n");
         FPMpowerMgrStatus = 1;
         int i;
         int FP_SleepFailedTimes = 0;
@@ -824,6 +827,7 @@ static void ComTask(MultiTimer* timer, void* userData)
                 }
             }
             if (FPMpowerMgrStatus == FPMpowerDown) {
+                PRINT("FPMpowerDown\n");
                 UART1_Stop();
                 PORT_ClrBit(PORT12, PIN3);
                 INTP_Init(1 << 1, INTP_RISING);
@@ -867,12 +871,11 @@ static void ComTask(MultiTimer* timer, void* userData)
             PRINT("store\n");
         } else if (fpmTask.sleepFpmFlag) {
             fpmTask.sleepFpmFlag = 0;
-            StopIdentify();
             //    StopRegisterFp();
             PRINT("stop reg\n");
         }
     }
-    MultiTimerStart(&taskTimer, 12, ComTask, NULL);
+    MultiTimerStart(&taskTimer, 15, FPM_ComTask, NULL);
 }
 
 void FPM_ComSleep()
