@@ -38,9 +38,9 @@ void VibrationTestCallback(MultiTimer* timer, void* userData)
 
 void VibrationTestSleep()
 {
-    /* if (vibrationTestEnable) {		// 
+    if (vibrationTestEnable) {		// 
         INTP_Start(1 << 1);
     } else {
         INTP_Stop(1 << 1);
-    } */
+    }
 }

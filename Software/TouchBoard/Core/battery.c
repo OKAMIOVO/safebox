@@ -7,15 +7,24 @@
 #include "log.h"
 
 #include "safe_box.h"
-#include "battery_level.h"
+
+enum {
+    LEVEL_0 = 0,
+    LEVEL_1 = 1,
+    LEVEL_2,
+    LEVEL_3,
+    LEVEL_4,
+    LEVEL_5,
+    LEVEL_6,
+    LEVEL_7
+}BatteryLevel;
 
 void BatteryInit(void);
 void BatterySleep(void);
 struct Device battery = {NULL, BatteryInit, BatterySleep};
 extern void UART2_SendData(uint8_t *sendData);
 extern void delayMS(uint32_t n);
-
-enum BATTERY_LEVEL BatteryLevel;
+extern void SafeBoxFsm(uint8_t event, uint8_t *userData);
 
 MultiTimer batteryTimer;
 void BatteryTask(MultiTimer *timer, void *userData);
@@ -123,6 +132,13 @@ void BatteryInit()
         HardwareBatVoltageA2dFilter(temp_a2d); // 滤波更新a2d_data[a2d_databuffer_vbat]
         HardwareBatteryMgr_Task();
     }
+	if (BatteryLevel == LEVEL_0 || BatteryLevel == LEVEL_1)
+        {
+            SafeBoxFsm(LOW_BATTERY_ALARM, NULL);
+//            uint8_t battery[] = {LOW_BATTERY_ALARM};
+//            delayMS(500);
+//            UART2_SendData(battery);
+        }
 }
 void BatterySleep()
 {

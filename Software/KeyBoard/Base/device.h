@@ -16,5 +16,4 @@ void SleepTimerCallBack(MultiTimer* timer,void* userData);
 extern struct DeviceMgr deviceMgr;
 void DeviceInit(void);
 #define SLEEP_TIME 10000
-uint8_t sleepFlag = 0;
 #endif

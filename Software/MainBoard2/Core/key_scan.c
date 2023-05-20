@@ -4,6 +4,7 @@
 #include "gpio.h"
 #include <string.h>
 #include "key_scan.h"
+#include "log.h"
 
 void KeyIoInit(void);
 void KeyScan(MultiTimer* timer, void* userData);
@@ -46,6 +47,7 @@ void KeyScan(MultiTimer* timer, void* userData)
 }
 void KeyEventCallback(int keyValue, enum KeyEvent event)
 {
+    PRINT("KeyValue = %d,event = %d\n",keyValue,event);
     KeyEventHandler(keyValue, event);
 }
 void AsleepKeyBoard(MultiTimer* timer, void* userData)

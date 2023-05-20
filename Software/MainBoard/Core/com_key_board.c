@@ -25,6 +25,8 @@
 #define DATA_FRAME_CNT_MAX 20
 #define BUF_LEN_MAX 32
 
+extern void delayMS(uint32_t n);
+
 extern uint8_t mainSleepFlag;
 
 struct DataFrame
@@ -236,6 +238,7 @@ void UART2_ReceiveData()
         }
         else if(uart2RxBuff[2] == SLEEP)
         {
+            delayMS(60);
             mainSleepFlag = 1;
         }
 

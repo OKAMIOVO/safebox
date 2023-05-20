@@ -11,6 +11,8 @@
 uint8_t mainSleepFlag = 0;
 uint8_t awakeFlag = 0;
 
+extern uint8_t batteryDetectFlag;
+
 extern void Key_ComSleep(void);
 extern void ComSleep(void);
 extern void VibrationTestSleep(void);
@@ -18,6 +20,7 @@ extern void LedSleep();
 extern void CloseTestSleep(void);
 extern void KeyBoardSleep(void);
 extern void BatterySleep(void);
+extern void batteryDetectSleep(void);
 void SysTickSleep(void);
 
 extern void SysTickInit(void);
@@ -30,6 +33,7 @@ extern void CloseTestInit(void);
 extern void KeyIoInit(void);
 extern void BuzzerInit(void);
 extern void BatteryInit(void);
+extern void batteryDetectInit(void);
 
 uint64_t GetSysMsCnt(void);
 struct Device sysTick = { NULL, SysTickInit, SysTickSleep };
@@ -53,25 +57,29 @@ void SleepAndAwake()
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 1;
     __STOP();
-    // NVIC_SystemReset();
-    
+    //NVIC_SystemReset();
+    SysTickInit();
+	CloseTestInit();
+    MotorInit();
+    ComInit();
+    VibrationTestInit();
+    LedInit();
+    KeyIoInit();
+    BuzzerInit();
+    KeyComInit();
+	batteryDetectInit();
+	
+	
     CGC->PMUKEY = 0x192A;
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 0;
     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
-    SysTickInit();
-    MotorInit();
-    KeyComInit();
-    ComInit();
-    VibrationTestInit();
-    LedInit();
-    CloseTestInit();
-    KeyIoInit();
-    BuzzerInit();
-    //BatteryInit();
+    
+	
+	
+    // BatteryInit();
     // DeviceInit();
     // LockInit();
-    deviceMgr.sleepTime = 10000;
 }
 static uint64_t sysMsCnt = 0;
 volatile uint32_t g_ticks;
@@ -100,8 +108,10 @@ extern struct Device closeTest;
 extern struct Device keyBoard;
 extern struct Device buzzer;
 extern struct Device battery;
+extern struct Device batteryDetect;
 int main()
 {
+    batteryDetectFlag = 1;
     RegisterToDeviceList(&sysTick);
     RegisterToDeviceList(&motor);
     RegisterToDeviceList(&comKeyBoard);
@@ -113,6 +123,7 @@ int main()
     RegisterToDeviceList(&keyBoard);
     RegisterToDeviceList(&buzzer);
     RegisterToDeviceList(&battery);
+    RegisterToDeviceList(&batteryDetect);
 
     deviceMgr.sleepAndAwake = SleepAndAwake;
     deviceMgr.sleepTime = 10000;
@@ -128,8 +139,9 @@ int main()
             VibrationTestSleep();
             CloseTestSleep();
             KeyBoardSleep();
-            // BatterySleep();
+            //BatterySleep();
             Key_ComSleep();
+            //batteryDetectSleep();
             SysTickSleep();
             
             

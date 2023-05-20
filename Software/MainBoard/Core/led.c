@@ -16,7 +16,7 @@ void LedInit()
 }
 void LedSleep()
 {
-    PRINT("LedSleep!\n");
+	PORT_Init(PORT12,PIN4,INPUT);
     PORT_ClrBit(PORT12,PIN4);
 }
 struct Device led={NULL,LedInit,LedSleep};

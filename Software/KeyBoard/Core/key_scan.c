@@ -5,6 +5,7 @@
 #include "intp.h"
 #include <string.h>
 #include "key_filter.h"
+#include "log.h"
 //device def
 void KeyIoInit(void);
 void KeyBoardSleep(void);
@@ -78,6 +79,7 @@ void KeyScan(MultiTimer* timer, void* userData)
 }
 void KeyEventCallback(int keyValue, enum KeyEvent event)
 {
-    ReportKeyEvent(keyValue, event);
+    PRINT("KeyValue = %d,event = %d\n",keyValue,event);
+    // ReportKeyEvent(keyValue, event);
     MultiTimerStart(&deviceMgr.timer, SLEEP_TIME, SleepTimerCallBack, NULL);
 }

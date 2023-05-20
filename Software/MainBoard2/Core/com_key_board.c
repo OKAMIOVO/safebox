@@ -12,6 +12,7 @@
 #include "intp.h"
 // PRJ HEADERS
 #include "key_scan.h"
+#include "log.h"
 // extern func and vaviable
 void KeyEventHandler(int keyValue, enum KeyEvent event);
 
@@ -83,6 +84,7 @@ void ComInit()
 
 void SendDataFrame(struct DataFrame* dataFrame)
 {
+    // PRINT("MAIN2 send cmd:%02x,len:%d,buf\n:", dataFrame->cmd, dataFrame->len);
     com.sendBuf[0] = 0xaa;
     com.sendBuf[1] = dataFrame->len;
     com.sendBuf[2] = dataFrame->cmd;
@@ -109,6 +111,7 @@ static int RxHandler(const uint8_t* buf, int n)
     if (buf[len + 4] != 0xbb || buf[len + 3] != BitXorCal(buf + 1, len + 2)) {
         return 1;
     }
+    PRINT("MAIN2 recv cmd:%02x,len:%d,buf:\r\n", buf[2], buf[1]);
 #ifdef PRJ_KEY_BOARD
     if (buf[2] < 0x80)
 #else

@@ -75,6 +75,7 @@ void ComInit()
 
 void SendDataFrame(struct DataFrame* dataFrame)
 {
+    PRINT("KeyBoard send cmd:%02x,len:%d,buf\n:", dataFrame->cmd, dataFrame->len);
     com.sendBuf[0] = 0xaa;
     com.sendBuf[1] = dataFrame->len;
     com.sendBuf[2] = dataFrame->cmd;
@@ -85,7 +86,7 @@ void SendDataFrame(struct DataFrame* dataFrame)
 }
 static int RxHandler(const uint8_t* buf, int n)
 {
-	PrintfBuf(buf,n);
+	// PrintfBuf(buf,n);
 	return n;
     if (buf[0] != 0xaa) {
         return 1;
@@ -103,6 +104,7 @@ static int RxHandler(const uint8_t* buf, int n)
     if (buf[len + 4] != 0xbb || buf[len + 3] != BitXorCal(buf + 1, len + 2)) {
         return 1;
     }
+    PRINT("KeyBoard recv cmd:%02x,len:%d,buf:\r\n", buf[2], buf[1]);
     if (buf[2] < 0x80) { // need reply to main board
         com.toReplyFlag = 1;
         com.replyDataFrame.cmd = buf[2];

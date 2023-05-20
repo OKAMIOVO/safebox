@@ -83,6 +83,7 @@ int8_t passwordInputCnt = 0;
 MultiTimer doorNotCloseTimer;
 #define PASSWORD_FAIL_TIMES_MAX 3
 #define FINGERPRINT_FAIL_TIMES_MAX 5
+#define INVALID_KEY_NUM -1
 uint8_t passwordIdentifyFailTimes = 0;
 uint8_t fingerprintIdentifyFailTimes = 0;
 uint8_t alarmType = VIBRATION_ALARM;
@@ -112,6 +113,7 @@ extern void UART2_SendData(uint8_t *sendData);
 // extern void CtrlTouchBoardLed(uint8_t* ledBuf);
 extern void SendFpmCmd(uint8_t state, uint8_t data);
 extern void SleepFpmBoard(void);
+extern void KeyEventCallback(int keyValue, enum KeyEvent event);
 
 void DelayExcuteCb(MultiTimer *timer, void *userData)
 {
@@ -119,6 +121,8 @@ void DelayExcuteCb(MultiTimer *timer, void *userData)
 }
 static void SafeSleep(MultiTimer *timer, void *userData)
 {
+    // KeyEventCallback(INVALID_KEY_NUM,PUSH_EVENT);
+    KeyEventCallback(INVALID_KEY_NUM,RELEASE_EVENT);
     PRINT("Enter safesleep!\r\n");
     // SetLedState(LED_TOUCH_BOARD_NUM,OFF);
     // sysState = SLEEP_STATE;
@@ -173,6 +177,7 @@ void GotoDoorOpenedState()
     OpenLed(LED_UNLOCK_NUM);
     CloseLed(LED_LOCK_NUM);
     PRINT("GotoDoorOpenedState LED_LOCK_NUM Close!\n");
+    //MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
     // CtrlTouchBoardLed(ledState);
 }
 void LockInit()

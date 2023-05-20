@@ -10,8 +10,9 @@
 #include "sci.h"
 void CloseTestInit(void);
 void CloseTestSleep(void);
+
 struct Device closeTest = { NULL, CloseTestInit, CloseTestSleep };
-static MultiTimer closeTestTimer;
+static MultiTimer closeTestTimer,mainSleepTimer;
 void CloseTestCallback(MultiTimer* timer, void* userData);
 extern void UART2_SendData(uint8_t data[]);
 void CloseTestInit()
@@ -45,4 +46,6 @@ void CloseTestCallback(MultiTimer* timer, void* userData)
 void CloseTestSleep()
 {
     INTP_Stop(1 << 1);
+    INTP_Init(1 << 1, INTP_RISING);
+    INTP_Start(1 << 1);
 }
