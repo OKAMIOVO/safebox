@@ -45,7 +45,6 @@ void CloseTestCallback(MultiTimer* timer, void* userData)
 
 void CloseTestSleep()
 {
-    INTP_Stop(1 << 1);
-    INTP_Init(1 << 1, INTP_RISING);
-    INTP_Start(1 << 1);
+    INTP_Init(1 << 2, INTP_BOTH);
+    INTP_Start(1 << 2);
 }

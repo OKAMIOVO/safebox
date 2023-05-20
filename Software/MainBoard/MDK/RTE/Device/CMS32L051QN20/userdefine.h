@@ -1260,9 +1260,9 @@ typedef enum
 
 /* ToDo: You can allocate the INTP2 to any desired pins with INTP2PCFG register */
 #define INTP2_PORT_SETTING() do{ \
-        PORT->INTP2PCFG = 0x24;     /* allocate INTP2 to P51 */ \
-        PORT->PM12  |=  (1 << 1);    /* P51 is used as INTP2 input */ \
-        PORT->PMC12 &= ~(1 << 1);    /* P51 digital function */ \
+        PORT->INTP2PCFG = 0x0e;     /* allocate INTP2 to P51 */ \
+        PORT->PM12  |=  (1 << 3);    /* P51 is used as INTP2 input */ \
+        PORT->PMC12 &= ~(1 << 3);    /* P51 digital function */ \
 }while(0)
 
 /* ToDo: You can allocate the INTP3 to any desired pins with INTP3PCFG register */

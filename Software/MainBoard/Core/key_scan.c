@@ -89,6 +89,7 @@ void KeyBoardSleep()
         PORT_Init(keyIO[i].port, keyIO[i].pin, OUTPUT);
         PORT_ClrBit(keyIO[i].port, keyIO[i].pin);
     }
+    
 }
 void KeyScan(MultiTimer* timer, void* userData)
 {
