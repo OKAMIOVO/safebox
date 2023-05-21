@@ -46,6 +46,8 @@ static uint8_t rxByte;
 
 void ComInit(void);
 void ComSleep(void);
+extern void UART2_SendData(uint8_t *sendData);
+static void SendDataFrame(struct DataFrame* dataFrame);
 struct Device comOtherSys = { NULL, ComInit, ComSleep };
 
 static MultiTimer comTimer;
@@ -109,6 +111,7 @@ static int RxHandler(const uint8_t* buf, int n)
     if (buf[len + 4] != 0xbb || buf[len + 3] != BitXorCal(buf + 1, len + 2)) {
         return 1;
     }
+    PRINT("recv from other sys,cmd:%02x,len:%d,buf:", buf[2], buf[1]);
 #if SYS_NUM == 1
     if (buf[2] & 0x80)
 #else
@@ -128,6 +131,8 @@ static int RxHandler(const uint8_t* buf, int n)
                     com.timeoutCnt = 0;
                     Dequeue(com.txQueue);
                     // SafeBoxFsm(PASSWORD_BACKUP_SUCCESS,NULL);
+                    uint8_t pbs[] = {PASSWORD_BACKUP_SUCCESS};
+                    UART2_SendData(pbs);
                 }
             }
         }

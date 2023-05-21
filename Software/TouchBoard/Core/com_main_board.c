@@ -109,6 +109,16 @@ void UART2_SendData(uint8_t *sendData)
     SendDataFrame(&dataFrame);
 }
 
+void UART2_SendPassWord(uint8_t *sendData,uint8_t sendLen,uint8_t sendBuf[])
+{
+    struct DataFrame passWordDataFrame;
+
+    passWordDataFrame.len = sendLen;
+    passWordDataFrame.cmd = sendData[0];
+    memcpy(passWordDataFrame.dataBuf, sendBuf, sendLen);
+    SendDataFrame(&passWordDataFrame);
+}
+
 void SendDataFrame(struct DataFrame *dataFrame)
 {
     PRINT("TOUCH send cmd:%02x,len:%d,buf\n:", dataFrame->cmd, dataFrame->len);

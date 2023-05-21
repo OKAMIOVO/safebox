@@ -11,6 +11,7 @@
 
 //#include "safe_box.h"
 #include "sci.h"
+#include "key.h"
 
 enum {
     READ_USER_LIST_FINISH,
@@ -89,7 +90,6 @@ void KeyBoardSleep()
         PORT_Init(keyIO[i].port, keyIO[i].pin, OUTPUT);
         PORT_ClrBit(keyIO[i].port, keyIO[i].pin);
     }
-    
 }
 void KeyScan(MultiTimer* timer, void* userData)
 {

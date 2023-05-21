@@ -23,6 +23,7 @@
 #define VOICE_CONTINUE 0xf2
 #define VOICE_STOP 0xfe
 extern uint8_t ledState[LED_CNT];
+void UART2_SendPassWord(uint8_t *sendData,uint8_t sendLen,uint8_t sendBuf[]);
 
 void OpenLed(uint8_t ledNum)
 {
@@ -429,8 +430,11 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
             PRINT("restore factory\n");
             MultiTimerStart(&restoreFactoryTimer, 3000, RestoreFactoryTimeoutCallback, NULL);
             //            SendPasswordToOtherSys(NULL, 0);
+            uint8_t backup[] = {BACK_UP};
+            UART2_SendPassWord(backup,0,NULL);
+
         }
-        else if (/* event == PASSWORD_BACKUP_SUCCESS && */ restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
+        else if (event == PASSWORD_BACKUP_SUCCESS && restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
         {
             fpmUserCnt = 0;
             SendFpmCmd(FPM_CLR_CMD, 0);
@@ -866,6 +870,8 @@ void RegPasswordKeyHandler(int keyValue, uint8_t event)
                     {
                         RestorePassword(passwordInputBuf[0], passwordInputCnt);
                         ReadPassword();
+                        uint8_t backup[] = {BACK_UP};
+                        UART2_SendPassWord(backup,passwordLen,passwordBuf);
                         //                        SendPasswordToOtherSys(passwordBuf, passwordLen);
                         // 通知备用板密码
                         PRINT("RestorePassword,registerState = FINGERPRINT_REGISTER;\n");

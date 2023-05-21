@@ -26,6 +26,7 @@
 #define BUF_LEN_MAX 32
 
 extern void delayMS(uint32_t n);
+extern void SendPasswordToOtherSys(const uint8_t* password, int len);
 
 extern uint8_t mainSleepFlag;
 
@@ -240,6 +241,10 @@ void UART2_ReceiveData()
         {
             delayMS(60);
             mainSleepFlag = 1;
+        }
+        else if(uart2RxBuff[2] == BACK_UP)
+        {
+            SendPasswordToOtherSys(&uart2RxBuff[3],uart2RxBuff[1]);
         }
 
         uart2RxFlag = 0;

@@ -45,7 +45,8 @@ enum {
     BEEP,
     VIBRATION_ENABLE,
     VIBRATION_DISABLE,
-    SLEEP
+    SLEEP,
+    BACK_UP
     // DOOR_OPEN_TIMEOUT
 };
 #define OPEN_LED() PORT_SetBit(PORT12, PIN4)
