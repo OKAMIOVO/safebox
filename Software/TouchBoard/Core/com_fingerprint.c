@@ -1082,7 +1082,7 @@ void StartRegisterFpCb(MultiTimer* timer, void* userData)
         } else {
             if ((FpmAckMgr.ErrorCode == Error_GetImage) || (FpmAckMgr.ErrorCode == Error_NoFinger) || (FpmAckMgr.ErrorCode == Error_BadImage)) {
                 StartRegisterFp(FpRegisterMgr.EnrollSuccessTimes);
-                PRINT("no image RESTART\n");
+                // PRINT("no image RESTART\n");
             } else {
                 FpRegGenCharResult(FpmAckMgr.ErrorCode);
                 PRINT("ERROR CODE =%d\n", FpmAckMgr.ErrorCode);

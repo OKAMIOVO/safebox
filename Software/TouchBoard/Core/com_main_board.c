@@ -10,6 +10,8 @@
 #include "log.h"
 #include "key_filter.h"
 #include "intp.h"
+#include "safe_box.h"
+
 void StartIdentifyFp(void);
 void StopIdentify(void);
 void StartRegisterFp(uint8_t);
@@ -68,6 +70,7 @@ extern void SafeBoxFsm(uint8_t event, uint8_t *userData);
 void SendDataFrame(struct DataFrame *dataFrame);
 uint8_t uart2RxFlag = 0;
 const uint8_t* uart2RxBuff;
+extern uint8_t passworbpsFlag;
 void UART2_ReceiveData();
 
 void Uart2SendEndCallback()
@@ -135,17 +138,7 @@ void SendDataFrame(struct DataFrame *dataFrame)
 #define FPM_CTRL 0x30
 #define VOICE_CMD 0x40
 #define SLEEP_CMD 0x50
-enum
-{
-    FPM_START_IDENTIFY,
-    FPM_STOP_IDENTIFY,
-    FPM_START_REGISTER,
-    FPM_CONTINUE_REGISTER,
-    FPM_STORE,
-    FPM_EXIT_REGISTER,
-    FPM_CLR_CMD,
-    FPM_SET_COLOR
-};
+
 struct FpmComTask
 {
     uint8_t startIdentifyFlag : 1;
@@ -262,7 +255,13 @@ void UART2_ReceiveData()
     {
         PRINT("TOUCH recv cmd:%02x,len:%d,buf:\r\n", uart2RxBuff[2], uart2RxBuff[1]);
         PrintfBuf(uart2RxBuff + 3, uart2RxBuff[1]);
-        SafeBoxFsm(uart2RxBuff[2], NULL);
+        if(uart2RxBuff[2] == PASSWORD_BACKUP_SUCCESS){
+            passworbpsFlag = 1;
+            PRINT("passworbpsFlag == %d\n",passworbpsFlag);
+        }else{
+            SafeBoxFsm(uart2RxBuff[2], NULL);
+        }
+        
 
         uart2RxFlag = 0;
     }
@@ -283,7 +282,7 @@ void ComTask(MultiTimer *timer, void *userData)
         }else if(com.rxBuf[com.rxCnt] == 32){
             KeyEventCallback(13,0);
         } */
-        // SafeBoxFsm(com.rxBuf[com.rxCnt],NULL);
+        //SafeBoxFsm(com.rxBuf[com.rxCnt],NULL);
         //  KeyEventCallback(com.rxBuf[com.rxCnt],0);
         //}
 

@@ -23,6 +23,7 @@
 #define VOICE_CONTINUE 0xf2
 #define VOICE_STOP 0xfe
 extern uint8_t ledState[LED_CNT];
+uint8_t passworbpsFlag = 0;
 void UART2_SendPassWord(uint8_t *sendData,uint8_t sendLen,uint8_t sendBuf[]);
 
 void OpenLed(uint8_t ledNum)
@@ -430,11 +431,12 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
             PRINT("restore factory\n");
             MultiTimerStart(&restoreFactoryTimer, 3000, RestoreFactoryTimeoutCallback, NULL);
             //            SendPasswordToOtherSys(NULL, 0);
+            PRINT("SAFEBOX passworbpsFlag == %d\n",passworbpsFlag);
             uint8_t backup[] = {BACK_UP};
             UART2_SendPassWord(backup,0,NULL);
 
         }
-        else if (event == PASSWORD_BACKUP_SUCCESS && restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
+        else if (passworbpsFlag == 1 && restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
         {
             fpmUserCnt = 0;
             SendFpmCmd(FPM_CLR_CMD, 0);
@@ -531,7 +533,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
                 {
                     MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
                     enrollTimes++;
-                    if (enrollTimes <= 5)
+                    if (enrollTimes <= 6)
                     {
                         uint8_t temp[] = {VOICE_PLEASE, VOICE_AGAIN, VOICE_INPUT};
                         PLAY_VOICE_SEGMENT(temp, sizeof(temp));
@@ -886,8 +888,10 @@ void RegPasswordKeyHandler(int keyValue, uint8_t event)
                     }
                     else
                     {
-                        PlayRegisterFail();
-                        SetLedState(LED_TOUCH_BOARD_NUM, OFF);
+                        uint8_t temp[] = {VOICE_REGISTER, VOICE_FAIL,VOICE_PLEASE_TRY_AGAIN};
+                        PLAY_VOICE_SEGMENT(temp,3);
+                        keyEventHandler = WaitRegKeyHandler;
+                        // SetLedState(LED_TOUCH_BOARD_NUM, OFF);
                         PRINT("RegisterFail\n");
                     }
                 }

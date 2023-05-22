@@ -83,7 +83,7 @@ void ComInit()
 
 static void SendDataFrame(struct DataFrame* dataFrame)
 {
-    PRINT("send to other sys,cmd:%02x,len:%d,buf:", dataFrame->cmd, dataFrame->len);
+    PRINT("send to other sys,cmd:%02x,len:%d,buf:\n", dataFrame->cmd, dataFrame->len);
     PrintfBuf(dataFrame->dataBuf, dataFrame->len);
     com.sendBuf[0] = 0xaa;
     com.sendBuf[1] = dataFrame->len;
@@ -111,11 +111,13 @@ static int RxHandler(const uint8_t* buf, int n)
     if (buf[len + 4] != 0xbb || buf[len + 3] != BitXorCal(buf + 1, len + 2)) {
         return 1;
     }
-    PRINT("recv from other sys,cmd:%02x,len:%d,buf:", buf[2], buf[1]);
+    PRINT("recv from other sys,cmd:%02x,len:%d,buf:\n", buf[2], buf[1]);
+    PrintfBuf(&buf[3], buf[1]);
+    PRINT("com.waitReplyFlag == %d\n",com.waitReplyFlag);
 #if SYS_NUM == 1
-    if (buf[2] & 0x80)
-#else
     if ((buf[2] & 0x80) == 0)
+#else
+    if (buf[2] & 0x80) 
 #endif
     { // need reply to main board
         com.toReplyFlag = 1;
@@ -123,6 +125,8 @@ static int RxHandler(const uint8_t* buf, int n)
         com.replyDataFrame.len = 0;
     } else { // get reply from main board
         if (com.waitReplyFlag) {
+            PRINT("buf[2] == %02x\n",buf[2]);
+            PRINT("GetFront(com.txQueue).cmd == %02x\n",GetFront(com.txQueue).cmd);
             if (buf[2] == GetFront(com.txQueue).cmd) {
                 if (buf[2] == 0x50 && BufCmp(GetFront(com.txQueue).dataBuf, buf + 3, GetFront(com.txQueue).len) != 0) { // need confirm password identical
                     com.timeoutCnt = 10;
