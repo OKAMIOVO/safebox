@@ -533,7 +533,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
                 {
                     MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
                     enrollTimes++;
-                    if (enrollTimes <= 6)
+                    if (enrollTimes <= 5)
                     {
                         uint8_t temp[] = {VOICE_PLEASE, VOICE_AGAIN, VOICE_INPUT};
                         PLAY_VOICE_SEGMENT(temp, sizeof(temp));

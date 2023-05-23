@@ -61,7 +61,7 @@ void Uart2RxByteCallback()
 void ComInit()
 {
     SystemCoreClockUpdate();
-    UART2_Init(SystemCoreClock, 9600);
+    UART2_Init(SystemCoreClock, 19200);
     UART2_Receive(&rxByte, 1);
     InitQueue(com.txQueue, DATA_FRAME_CNT_MAX, txDataFrame);
     com.sendBusyFlag = 0;

@@ -70,7 +70,7 @@ void Uart2RxByteCallback()
 void ComInit()
 {
     SystemCoreClockUpdate();
-    UART2_Init(SystemCoreClock, 9600);
+    UART2_Init(SystemCoreClock, 19200);
     UART2_Receive(&rxByte, 1);
     InitQueue(com.txQueue, DATA_FRAME_CNT_MAX, txDataFrame);
     com.sendBusyFlag = 0;
@@ -84,7 +84,7 @@ void ComInit()
 
 void SendDataFrame(struct DataFrame* dataFrame)
 {
-    // PRINT("MAIN2 send cmd:%02x,len:%d,buf\n:", dataFrame->cmd, dataFrame->len);
+    PRINT2("MAIN2 send cmd:%02x,len:%d,buf\n:", dataFrame->cmd, dataFrame->len);
     com.sendBuf[0] = 0xaa;
     com.sendBuf[1] = dataFrame->len;
     com.sendBuf[2] = dataFrame->cmd;
@@ -111,7 +111,7 @@ static int RxHandler(const uint8_t* buf, int n)
     if (buf[len + 4] != 0xbb || buf[len + 3] != BitXorCal(buf + 1, len + 2)) {
         return 1;
     }
-    PRINT("MAIN2 recv cmd:%02x,len:%d,buf:\r\n", buf[2], buf[1]);
+    PRINT2("MAIN2 recv cmd:%02x,len:%d,buf:\r\n", buf[2], buf[1]);
 #ifdef PRJ_KEY_BOARD
     if (buf[2] < 0x80)
 #else

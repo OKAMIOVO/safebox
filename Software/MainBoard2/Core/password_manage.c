@@ -76,6 +76,7 @@ void DelFirstElem(uint8_t* buf,int n)
 }
 void KeyEventHandler(int keyValue, enum KeyEvent event)
 {
+    //PRINT2("keyValue = %d,event = %d\n",keyValue,event);
     if (event == PUSH_EVENT) {
         // printf("push %d\n",keyMap[chn]);
         if (keyValue < 10) {
@@ -87,11 +88,11 @@ void KeyEventHandler(int keyValue, enum KeyEvent event)
             }  
         } else {
             if (keyValue == KEY_POUND) {
-                PRINT("verify:");
-                PRINT("password restore:");
-                PrintfBuf(passwordBuf, passwordCnt);
-                PRINT("password input:");
-                PrintfBuf(passwordInputBuf, passwordInputCnt);
+                PRINT2("verify:");
+                PRINT2("password restore:");
+                Print2fBuf(passwordBuf, passwordCnt);
+                PRINT2("password input:");
+                Print2fBuf(passwordInputBuf, passwordInputCnt);
                 if (IsPasswordCorrect(passwordInputBuf, passwordInputCnt)) {
                     StartUnlock();
                 }

@@ -79,3 +79,14 @@ void SendBuf(uint8_t* buf, int len)
         ;
     delayMS(2);
 }
+
+void UART2_SendBuf(uint8_t* buf, int len)
+{
+    while (g_uart2_tx_count)
+        ;
+    delayMS(2);
+    UART2_Send(buf, len);
+    while (g_uart2_tx_count)
+        ;
+    delayMS(2);
+}
