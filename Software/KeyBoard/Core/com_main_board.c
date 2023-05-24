@@ -86,8 +86,9 @@ void SendDataFrame(struct DataFrame* dataFrame)
 }
 static int RxHandler(const uint8_t* buf, int n)
 {
+    
 	// PrintfBuf(buf,n);
-	return n;
+	// return n;
     if (buf[0] != 0xaa) {
         return 1;
     }
@@ -123,6 +124,7 @@ static int RxHandler(const uint8_t* buf, int n)
     }
     return len + 5;
 }
+
 void ComTask(MultiTimer* timer, void* userData)
 {
     while (com.rxCnt < BUF_LEN_MAX && !IsEmpty(com.rxQueue)) {
@@ -169,9 +171,7 @@ void ReportKeyEvent(int keyValue, enum KeyEvent event)
     temp.len = 2;
     temp.dataBuf[0] = (uint8_t)keyValue;
     temp.dataBuf[1] = (uint8_t)event;
-    if (!IsFull(com.txQueue)) {
-        EnqueueElem(com.txQueue, temp);
-    }
+    SendDataFrame(&temp);
 }
 
 void ComSleep()

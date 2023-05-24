@@ -147,6 +147,7 @@ void StartIdentify()
     passwordInputCnt = 0;
     PRINT("keyEventHandler = IdentifyKeyHandler;\n");
     PRINT("password len=%d\n", passwordLen);
+	PRINT("fpmUserCnt=%d\n", fpmUserCnt);
     restoreFactoryTimer.callback = NULL;
     SendFpmCmd(FPM_START_IDENTIFY, 0);
     MultiTimerStart(&sleepTimer,10000,SafeSleep,NULL);
@@ -258,6 +259,7 @@ void StartRegister(uint8_t entry)
         keyEventHandler = WaitRegKeyHandler;
         SendFpmCmd(FPM_START_REGISTER, 0);
         PRINT("keyEventHandler = WaitRegKeyHandler;\n");
+        MultiTimerStart(&registerTimer, 10000, RegFpTimeoutCallback, NULL);
     }
     PLAY_VOICE_SEGMENT(temp, voiceLen);
 }
@@ -284,6 +286,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
             // 是否需要保存用户列表
             fpmUserCnt = *userData;
             StartIdentify();
+			PRINT("INIT_STATE fpmUserCnt = %d\n",fpmUserCnt);
             PRINT("INTI FINISH\n");
         } else if (event == READ_USER_LIST_TIMEOUT) {
             // 播报故障语音
@@ -350,6 +353,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
         else if (event == IDENTIFY_FAIL)
         {
             MultiTimerStop(&sleepTimer);
+            PRINT("passwordLen = %d,fpmUserCnt = %d\n",passwordLen,fpmUserCnt);
             if (passwordLen == 0 && fpmUserCnt == 0)
             {
                 IdentifyPass();
@@ -376,7 +380,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
                     if (passwordIdentifyFailTimes >= PASSWORD_FAIL_TIMES_MAX)
                     {
                         passwordIdentifyFailTimes = 0;
-                        SetLedState(LED_TOUCH_BOARD_NUM, OFF);
+                        // SetLedState(LED_TOUCH_BOARD_NUM, OFF);
                         GotoAlarmState(ERROR_ALARM);
                     }
                 }
@@ -439,11 +443,13 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
         else if (passworbpsFlag == 1 && restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
         {
             fpmUserCnt = 0;
+            SendFpmCmd(FPM_STOP_IDENTIFY, 0);
             SendFpmCmd(FPM_CLR_CMD, 0);
             ClrPassword();
             GotoDoorOpenedState();
             restoreFactoryTimer.callback = NULL;
             MultiTimerStop(&restoreFactoryTimer);
+
             uint8_t temp[] = {VOICE_RESTORE_FACTORY, VOICE_SUCCESS};
             PLAY_VOICE_SEGMENT(temp, sizeof(temp));
         }
@@ -477,7 +483,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
         if (event == EXIT_REGISTER)
         {
             CloseLed(LED_SET_NUM);
-            SetLedState(LED_TOUCH_BOARD_NUM, OFF);
+            // SetLedState(LED_TOUCH_BOARD_NUM, OFF);
             PRINT("REGISTER_STATE EXIT_REGISTER LED_SET_NUM Close!\n");
             // CtrlTouchBoardLed(ledState);
             SendFpmCmd(FPM_EXIT_REGISTER, 0);
@@ -506,7 +512,7 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
             MultiTimerStop(&doorNotCloseTimer);
             PRINT("DOOR_CLOSE FPM_STOP_IDENTIFY\n");
             SendFpmCmd(FPM_STOP_IDENTIFY, 0);
-            SendFpmCmd(FPM_SET_COLOR, OFF);
+            // SendFpmCmd(FPM_SET_COLOR, OFF);
             // 通知触摸板休眠
         }
         else
@@ -713,7 +719,7 @@ void IdentifyKeyHandler(int keyValue, uint8_t event) // after register password 
                         PrintfBuf(passwordBuf, passwordLen);
                         if (IsPasswordCorrect(passwordInputBuf[0], passwordInputCnt))
                         {
-                            SetLedState(LED_TOUCH_BOARD_NUM, OFF);
+                            SetLedState(LED_TOUCH_BOARD_NUM, OPEN);
                             PRINT("pass send IDENTIFY_SUCCESS\n");
                             SafeBoxFsm(IDENTIFY_SUCCESS, &temp);
                         }

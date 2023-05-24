@@ -133,7 +133,7 @@ void dealWithFpmData(MultiTimer* timer, void* userData){
 
         // fpmCnt++;
     }
-    MultiTimerStart(&comTimer, 5, dealWithFpmData, NULL);
+    MultiTimerStart(&comTimer, 1, dealWithFpmData, NULL);
 
 }
 

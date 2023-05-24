@@ -51,6 +51,7 @@ void ClrPassword()
     //passwordLen = 0;
     EraseSector(PASSWORD_RESSTORE_ADDR);
     ReadPassword();
+    // PrintfBuf(passwordBuf, 12);
 }
 int IsPasswordCorrect(const uint8_t* inputBuf, int n)
 {

@@ -58,7 +58,7 @@ static int RxHandler(const uint8_t* buf, int n)
                 PRINT("restore password\n");
             }
         } else if (buf[3] == 0) {
-           // ClrPassword();
+            ClrPassword();
             PRINT("clr password\n");
         }
         memcpy(txBuf, buf, len + 5);

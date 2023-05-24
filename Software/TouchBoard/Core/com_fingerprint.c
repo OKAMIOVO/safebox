@@ -681,9 +681,12 @@ void ComInit()
     if (FpmAckMgr.Status == GotACK) {
         if (FpmAckMgr.ErrorCode == Error_NONE) {
             USERID = 0x00;
+            PrintfBuf(&(FpmAckMgr.Buff[10]), 32);
             for (i = 0; i < 32; i++) {
                 for (j = 0; j < 8; j++) {
                     if ((FpmAckMgr.Buff[10 + i] & 0x01) != 0) {
+                        
+                        // PRINT("FpmAckMgr.Buff[%d] = %8x\n",10+i,(FpmAckMgr.Buff[10 + i]));
                         if (USERID < 20) {
                             fpUserCnt++;
                         }
@@ -692,6 +695,8 @@ void ComInit()
                     USERID++;
                 }
             }
+            
+            PRINT("fpUserCnt == %d\n",fpUserCnt);
             FpmUserReport(fpUserCnt);
             PRINT("FpmUserReport excute!\n");
             //  PLAY_VOICE_MULTISEGMENTS_FIXED(&temp,1);
@@ -862,6 +867,7 @@ void FPM_ComTask(MultiTimer* timer, void* userData)
             ContinueRegisterFp(fpmTask.continueEnrollTimes);
             PRINT("continue reg\n");
         } else if (fpmTask.clrAllFpFlag) {
+            PRINT("DEL ALL\n");
             fpmTask.clrAllFpFlag = 0;
             DelAllUserFormFpm();
             PRINT("DEL ALL\n");

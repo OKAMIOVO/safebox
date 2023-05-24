@@ -90,6 +90,7 @@ void KeyEventHandler(int keyValue, enum KeyEvent event)
             if (keyValue == KEY_POUND) {
                 PRINT2("verify:");
                 PRINT2("password restore:");
+                ReadPassword();
                 Print2fBuf(passwordBuf, passwordCnt);
                 PRINT2("password input:");
                 Print2fBuf(passwordInputBuf, passwordInputCnt);

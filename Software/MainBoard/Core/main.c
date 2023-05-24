@@ -57,18 +57,7 @@ void SleepAndAwake()
     CGC->PMUKEY = 0x3E4F;
     CGC->PMUCTL = 1;
     __STOP();
-    //NVIC_SystemReset();
-    SysTickInit();
-	CloseTestInit();
-    MotorInit();
-    ComInit();
-    VibrationTestInit();
-    LedInit();
-    KeyIoInit();
-    BuzzerInit();
-    KeyComInit();
-	batteryDetectInit();
-	
+    NVIC_SystemReset();
 	
     CGC->PMUKEY = 0x192A;
     CGC->PMUKEY = 0x3E4F;
@@ -111,7 +100,6 @@ extern struct Device battery;
 extern struct Device batteryDetect;
 int main()
 {
-    batteryDetectFlag = 1;
     RegisterToDeviceList(&sysTick);
     RegisterToDeviceList(&motor);
     RegisterToDeviceList(&comKeyBoard);

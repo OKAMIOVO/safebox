@@ -20,7 +20,7 @@ void batteryDetectInit(void)
         {
             // SafeBoxFsm(LOW_BATTERY_ALARM, NULL);
             uint8_t battery[] = {LOW_BATTERY_ALARM};
-            delayMS(500);
+            delayMS(1000);
             UART2_SendData(battery);
         }
 }
