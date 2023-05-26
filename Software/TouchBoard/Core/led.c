@@ -63,9 +63,9 @@ void LedTask(MultiTimer *timer, void *userData)
         PORT_SetBit(ledIO[ledIoNumList[ledNum][0]].port, ledIO[ledIoNumList[ledNum][0]].pin);
     }
      ledNum++;
-     if (ledNum >= 4) {
-         ledNum = 0;
-     }
+    if (ledNum >= 4) {
+        ledNum = 0;
+    }
     // PORT_SetBit(PORT12, PIN4);
     /* PORT_Init(PORT13, PIN7, OUTPUT);
     PORT_Init(PORT4, PIN0, OUTPUT);

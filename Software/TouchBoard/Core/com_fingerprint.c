@@ -788,6 +788,7 @@ void delayMS(uint32_t n);
 #define FPMpowerDown 0
 uint8_t FPMpowerMgrStatus;
 #define PINMACRO_FPM_TOUCH_STATUS (PORT_GetBit(PORT13, PIN6))
+extern int8_t fpmUserCnt;
 void FPM_ComTask(MultiTimer* timer, void* userData)
 {
     // PRINT("FPM_ComTask\n");
@@ -866,12 +867,11 @@ void FPM_ComTask(MultiTimer* timer, void* userData)
             fpmTask.continueRegisterFlag = 0;
             ContinueRegisterFp(fpmTask.continueEnrollTimes);
             PRINT("continue reg\n");
-        } else if (fpmTask.clrAllFpFlag) {
-            PRINT("DEL ALL\n");
+        } /* else if (fpmTask.clrAllFpFlag) {
             fpmTask.clrAllFpFlag = 0;
             DelAllUserFormFpm();
             PRINT("DEL ALL\n");
-        } else if (fpmTask.storeFlag) {
+        }  */else if (fpmTask.storeFlag) {
             fpmTask.storeFlag = 0;
             StoreFp(fpmTask.storeUserId);
             PRINT("store\n");
@@ -880,6 +880,11 @@ void FPM_ComTask(MultiTimer* timer, void* userData)
             //    StopRegisterFp();
             PRINT("stop reg\n");
         }
+    }
+    if (fpmTask.clrAllFpFlag) {
+            fpmTask.clrAllFpFlag = 0;
+            DelAllUserFormFpm();
+            PRINT("DEL ALL\n");
     }
     MultiTimerStart(&taskTimer, 15, FPM_ComTask, NULL);
 }
@@ -1237,7 +1242,13 @@ void StopRegisterFp()
 void DelFpmCb(MultiTimer* timer, void* userData)
 {
     if (FpmAckMgr.Status == GotACK) {
-        PRINT("clr success!\n");
+        PRINT("FpmAckMgr.ErrorCode == %2x\n",FpmAckMgr.ErrorCode);
+        if(FpmAckMgr.ErrorCode == Error_NONE){
+            PRINT("clr success!\n");
+            fpmUserCnt = 0;
+        }else{
+            DelAllUserFormFpm();
+        }
     } else {
         PRINT("clr TIME OUT!\n");
         timeoutCnt++;
@@ -1247,7 +1258,7 @@ void DelFpmCb(MultiTimer* timer, void* userData)
             DelAllUserFormFpm();
         } else {
             PRINT("get image timeout\n");
-            MultiTimerStart(&comTimer, 100, DelFpmCb, NULL);
+            MultiTimerStart(&comTimer, 50, DelFpmCb, NULL);
         }
     }
 }
@@ -1256,5 +1267,5 @@ void DelAllUserFormFpm()
     timeoutCnt = 0;
     FpmAckMgr.Status = WaitACK;
     FPM_DeleteAllCharCmd();
-    MultiTimerStart(&comTimer, 200, DelFpmCb, NULL);
+    MultiTimerStart(&comTimer, 100, DelFpmCb, NULL);
 }

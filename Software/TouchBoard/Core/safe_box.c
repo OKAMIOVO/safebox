@@ -116,7 +116,7 @@ extern void UART2_SendData(uint8_t *sendData);
 extern void SendFpmCmd(uint8_t state, uint8_t data);
 extern void SleepFpmBoard(void);
 extern void KeyEventCallback(int keyValue, enum KeyEvent event);
-
+extern void delayMS(uint32_t n);
 void DelayExcuteCb(MultiTimer *timer, void *userData)
 {
     SafeBoxFsm(delayEvent, delayData);
@@ -154,7 +154,9 @@ void StartIdentify()
 }
 void GotoAlarmState(uint8_t type)
 {
+    PRINT("GotoAlarmState\n");
     sysState = ALARM_STATE;
+    PRINT("sysState = %d\n",sysState);
     alarmType = type;
     PRINT("fp ERROR alarm!\n");
     uint8_t temp = alarmType ? VOICE_ALARM2 : VOICE_ALARM1;
@@ -442,16 +444,16 @@ void SafeBoxFsm(uint8_t event, uint8_t *userData)
         }
         else if (passworbpsFlag == 1 && restoreFactoryTimer.callback == RestoreFactoryTimeoutCallback)
         {
-            fpmUserCnt = 0;
-            SendFpmCmd(FPM_STOP_IDENTIFY, 0);
+            /* SendFpmCmd(FPM_STOP_IDENTIFY, 0);
+            delayMS(15); */
             SendFpmCmd(FPM_CLR_CMD, 0);
             ClrPassword();
             GotoDoorOpenedState();
             restoreFactoryTimer.callback = NULL;
             MultiTimerStop(&restoreFactoryTimer);
-
             uint8_t temp[] = {VOICE_RESTORE_FACTORY, VOICE_SUCCESS};
             PLAY_VOICE_SEGMENT(temp, sizeof(temp));
+            
         }
         else if (event == RESTORE_FACTORY_FAIL)
         {
@@ -640,10 +642,11 @@ void KeyEventDisp(int keyValue, uint8_t event)
 void IdentifyPass()
 {
     MultiTimerStop(&sleepTimer);
-    uint8_t temp[] = {VOICE_IDENTIFY, VOICE_PASSED};
+    STOP_PLAY_VOICE_MULTISEGMENTS();
+    delayMS(50);
+	uint8_t temp[] = {VOICE_IDENTIFY, VOICE_PASSED};
+	PLAY_VOICE_SEGMENT(temp, 2);
     PRINT("IdentifyPass\n");
-    PLAY_VOICE_SEGMENT(temp, sizeof(temp));
-
     //    StartUnlock();
     uint8_t unlock[] = {START_UNLOCK};
     UART2_SendData(unlock);

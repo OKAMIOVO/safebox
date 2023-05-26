@@ -91,8 +91,8 @@ MultiTimer voiceTimer;
 
 void VoiceInit(void)
 {
-    PORT_Init(PORT1, PIN2, OUTPUT);       // VOICE DATA
-    PORT_Init(PORT2, PIN3, PULLUP_INPUT); // VOICE BUSY
+    PORT_Init(PORT1, PIN2, OUTPUT);         // VOICE DATA
+    PORT_Init(PORT2, PIN3, PULLUP_INPUT);   // VOICE BUSY
     TM40_IntervalTimer(TM4_CHANNEL_3, 225); // 需要测试保证准确300us
     VoiceDataTransferMgr.PulseWidthCnt = 0;
     VoiceDataTransferMgr.Status = VoiceIdle;
@@ -101,7 +101,7 @@ void VoiceInit(void)
 
 // void VoiceTask(MultiTimer *timer, void *userData)
 // {
-    
+
 //     MultiTimerStart(&voiceTimer, 1, VoiceTask, NULL);
 // }
 
@@ -125,12 +125,12 @@ void PLAY_VOICE_ONESEGMENT_FIXED(uint8_t segment)
 void PLAY_VOICE_TWOSEGMENT_FIXED(uint8_t segment1, uint8_t segment2)
 {
 
-    //   uint8_t Buff[4];
+    uint8_t Buff[4];
 
-    //    Buff[0] = segment1;
-    //    Buff[1] = segment2;
-    //    Buff[2] = DEF_VoiceSegmentEndFlag;
-    //  PLAY_VOICE_MULTISEGMENTS_FIXED(Buff);
+    Buff[0] = segment1;
+    Buff[1] = segment2;
+    Buff[2] = DEF_VoiceSegmentEndFlag;
+    PLAY_VOICE_MULTISEGMENTS_FIXED(Buff);
 }
 
 void PLAY_VOICE_THREESEGMENT_FIXED(uint8_t segment1, uint8_t segment2, uint8_t segment3)
@@ -237,7 +237,7 @@ void STOP_PLAY_VOICE_MULTISEGMENTS(void)
 {
     uint8_t SegmentCnt = 0;
 
-    VoiceDataTransferMgr.DataBuff[2 * SegmentCnt] = 0xFE;                                  // Continue play
+    VoiceDataTransferMgr.DataBuff[2 * SegmentCnt] = 0xFE; // Continue play
 
     VoiceDataTransferMgr.BitPoint = 0x00;
     VoiceDataTransferMgr.SendDataNum = 0;
@@ -272,7 +272,7 @@ void VoicePlayerPowerDown(void)
 void PlayWaterDrop()
 {
     uint8_t temp = VOICE_WATER_DROP;
-    PLAY_VOICE_ONESEGMENT(temp);
+    PLAY_VOICE_SEGMENT(&temp, 1);
     // PlayVoice(&temp, 1);
 }
 void PlayPleaseInputAain()
@@ -296,7 +296,8 @@ void PlayPleaseInputFpm()
     //    PlayVoice(temp, sizeof(temp));
 }
 
-void PlayInputFpm(void){
+void PlayInputFpm(void)
+{
     uint8_t temp[] = {VOICE_PLEASE, VOICE_INPUT, VOICE_FINGERPRINT};
     PLAY_VOICE_SEGMENT(temp, sizeof(temp));
 }
